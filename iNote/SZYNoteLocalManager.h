@@ -1,0 +1,20 @@
+//
+//  SZYNoteLocalManager.h
+//  iNote
+//
+//  Created by 孙中原 on 15/10/27.
+//  Copyright (c) 2015年 sunzhongyuan. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "SZYBaseLocalManager.h"
+
+@interface SZYNoteLocalManager : SZYBaseLocalManager
+
+
+-(NSMutableArray *)notesByNoteBookId:(NSString *)noteBookId;
+
+-(NSMutableArray *)notesWithFavorite;
+
+
+@end
