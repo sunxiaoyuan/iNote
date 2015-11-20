@@ -12,14 +12,35 @@
 
 @interface SZYRecorderViewController ()
 
+//上下底层视图
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topViewHeightConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomViewHeightConstrsint;
+//开始－暂停按钮
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *recordBtnHeightConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *recordBtnWidthConstrsint;
+//播放按钮
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *playBtnHeightConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *playBtnWidthConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *playBtnLeftConstrsint;
+//完成按钮
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *doneBtnHeightConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *doneBtnWidthConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *doneBtnRightConstrsint;
+//时间面板
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelWidthConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelHeightConstrsint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelTopConstrsint;
+
 - (IBAction)doneAction:(id)sender;
 - (IBAction)startAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)stopAction:(id)sender;
-@property (weak, nonatomic) IBOutlet UIProgressView *audioPower;
 
+@property (weak, nonatomic) IBOutlet UIProgressView *audioPower;
 @property (nonatomic, strong) AVAudioRecorder *audioRecorder;//音频录音机
 @property (nonatomic, strong) NSTimer *timer;//录音声波监控（注意这里暂时不对播放进行监控）
+
+
 @end
 
 @implementation SZYRecorderViewController
@@ -29,6 +50,36 @@
     //设置音频会话
     [self setAudioSession];
     
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    
+    [super viewWillAppear:animated];
+    
+    CGFloat viewW = self.view.bounds.size.width;
+    CGFloat viewH = self.view.bounds.size.height;
+    
+    //渲染界面
+    self.topViewHeightConstrsint.constant = viewH*0.6;
+    self.bottomViewHeightConstrsint.constant = viewH*0.4;
+
+    self.recordBtnWidthConstrsint.constant = viewW*0.4;
+    self.recordBtnHeightConstrsint.constant = viewW*0.4;
+    
+    self.playBtnWidthConstrsint.constant = viewW*0.08;
+    self.playBtnHeightConstrsint.constant = viewW*0.08;
+//    self.playBtnLeftConstrsint.constant = viewW*0.15;
+    
+    self.doneBtnWidthConstrsint.constant = 0.16*viewW;
+    self.doneBtnHeightConstrsint.constant = 0.07*viewH;
+//    self.doneBtnRightConstrsint.constant = viewW*0.15;
+    
+    self.timeLabelWidthConstrsint.constant = 0.4*viewW;
+    self.timeLabelHeightConstrsint.constant = 0.07*viewH;
+    self.timeLabelTopConstrsint.constant = 0.02*viewH;
+
+    [self.view layoutIfNeeded];
+
 }
 
 
@@ -44,6 +95,9 @@
     
 }
 - (IBAction)startAction:(id)sender {
+    
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.selected;
     
     if (![self.audioRecorder isRecording]) {
         [self.audioRecorder record]; //首次使用应用时如果调用record方法会询问用户是否允许使用麦克风

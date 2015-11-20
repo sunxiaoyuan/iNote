@@ -174,6 +174,7 @@
     
     txtUser = [[UITextField alloc] initWithFrame:CGRectMake(SIZ(30), SIZ(30), vLogin.frame.size.width - SIZ(60), SIZ(44))];
     txtUser.delegate = self;
+    txtUser.placeholder = @"手机号";
     txtUser.layer.cornerRadius = 5;
     txtUser.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     txtUser.layer.borderWidth = 0.5;
@@ -192,6 +193,7 @@
     txtPwd = [[UITextField alloc] initWithFrame:CGRectMake(SIZ(30), SIZ(90), vLogin.frame.size.width - SIZ(60), SIZ(44))];
     txtPwd.clearButtonMode = UITextFieldViewModeWhileEditing;
     txtPwd.delegate = self;
+    txtPwd.placeholder = @"密码";
     txtPwd.layer.cornerRadius = 5;
     txtPwd.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     txtPwd.layer.borderWidth = 0.5;
@@ -205,7 +207,7 @@
     
     //登陆
     loginBtn = [SZYMenuButton buttonWithType:UIButtonTypeCustom];
-    [loginBtn setBackgroundImage:[UIImage imageNamed:@"button_login_bg_6P"] forState:UIControlStateNormal];
+    [loginBtn setBackgroundImage:[UIImage imageNamed:@"btn_bg_blue"] forState:UIControlStateNormal];
     loginBtn.frame = CGRectMake(SIZ(30), CGRectGetMaxY(vLogin.frame) + SIZ(50), UIScreenWidth-SIZ(60), SIZ(50));
     [loginBtn setTitle:@"登 陆" forState:UIControlStateNormal];
     [loginBtn addTarget:self action:@selector(loginClick) forControlEvents:UIControlEventTouchUpInside];

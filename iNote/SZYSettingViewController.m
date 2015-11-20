@@ -20,7 +20,6 @@
 
 @interface SZYSettingViewController ()<UIAlertViewDelegate>
 
-
 @property (nonatomic, strong) UIView *bottomView;
 @property (nonatomic, strong) UIView *sepLineView;
 
@@ -37,8 +36,6 @@
 
 @property (nonatomic, strong) SZYLocalFileManager    *fileManager;
 
-
-
 @end
 
 @implementation SZYSettingViewController
@@ -50,12 +47,19 @@
     self.view.backgroundColor = UIColorFromRGB(0xf4f4f4);
     self.navigationItem.rightBarButtonItem = nil;
     self.fileManager = [SZYLocalFileManager sharedInstance];
+    
     //加载组件
     [self.view addSubview:self.bottomView];
     [self.bottomView addSubview:self.personalCenterView];
     [self.bottomView addSubview:self.cleanCacheView];
     [self.bottomView addSubview:self.sepLineView];
     [self.view addSubview:self.logoutBtn];
+    
+    UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
+    [self.personalCenterView addGestureRecognizer:tap1];
+    UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
+    [self.personalCenterView addGestureRecognizer:tap1];
+    [self.cleanCacheView addGestureRecognizer:tap2];
    
 }
 
@@ -82,16 +86,13 @@
 //    CGFloat viewX = UIScreenWidth * 0.12 / 2;
 //    CGFloat viewH = SIZ(50);
 //    CGFloat viewY = SIZ(40);
-//    
-//    
-//    
 //    [self viewAddSetingViewWithSetingView:self.personalCenterView frame:CGRectMake(viewX, viewY, viewW, viewH) tag:SZYSetingViewTypePersonalCenter];
 //    [self viewAddSetingViewWithSetingView:self.cleanCacheView frame:CGRectMake(viewX, viewY + viewH + SIZ(2), viewW, viewH) tag:SZYSetingViewTypeCleanCache];
 //    
 //    
 //    
     //设置“退出登录”是否出现
-//    self.logoutBtn.hidden = !ApplicationDelegate.isLoggedin;
+    self.logoutBtn.hidden = !ApplicationDelegate.isLoggedin;
     
     
 }
@@ -123,16 +124,16 @@
         case SZYSetingViewTypePersonalCenter:
             //跳转到个人中心详情页 或者 登陆界面
         {
-            if (ApplicationDelegate.isLoggedin) {
-                
-                SZYPersonalCenterViewController *centerVC = [SZYPersonalCenterViewController createFromStoryboardName:@"PersonalCenter" withIdentifier:@"PersonalCenterIB"];
-                [self.navigationController pushViewController:centerVC animated:YES];
-
-            }else{
-                
+//            if (ApplicationDelegate.isLoggedin) {
+//                
+//                SZYPersonalCenterViewController *centerVC = [SZYPersonalCenterViewController createFromStoryboardName:@"PersonalCenter" withIdentifier:@"PersonalCenterIB"];
+//                [self.navigationController pushViewController:centerVC animated:YES];
+//
+//            }else{
+            
                 SZYLgoinViewController *loginVC = [[SZYLgoinViewController alloc]init];
                 [self.navigationController pushViewController:loginVC animated:YES];
-            }
+//            }
         }
             break;
             
@@ -188,7 +189,7 @@
 -(SZYSettingView *)personalCenterView{
     if (!_personalCenterView){
         _personalCenterView = [SZYSettingView settingViewWithTitle:@"个人中心"];
-//        _personalCenterView.backgroundColor = [UIColor orangeColor];
+        _personalCenterView.tag = SZYSetingViewTypePersonalCenter;
     }
     return _personalCenterView;
 }
@@ -196,7 +197,7 @@
 -(SZYSettingView *)cleanCacheView{
     if (!_cleanCacheView){
         _cleanCacheView = [SZYSettingView settingViewWithTitle:@"清理缓存"];
-//        _cleanCacheView.backgroundColor = [UIColor orangeColor];
+        _cleanCacheView.tag = SZYSetingViewTypeCleanCache;
     }
     return _cleanCacheView;
 }

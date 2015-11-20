@@ -215,7 +215,7 @@
     
     //注册
     _regBtn = [SZYMenuButton buttonWithType:UIButtonTypeCustom];
-    [_regBtn setBackgroundImage:[UIImage imageNamed:@"button_login_bg_6P"] forState:UIControlStateNormal];
+    [_regBtn setBackgroundImage:[UIImage imageNamed:@"btn_bg_blue"] forState:UIControlStateNormal];
     _regBtn.frame = CGRectMake(SIZ(30), CGRectGetMaxY(vLogin.frame) + SIZ(20), UIScreenWidth-SIZ(60), SIZ(50));
     [_regBtn setTitle:@"注 册" forState:UIControlStateNormal];
     [_regBtn addTarget:self action:@selector(regClick) forControlEvents:UIControlEventTouchUpInside];

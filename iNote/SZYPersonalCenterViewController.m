@@ -432,7 +432,7 @@
 
 -(void)rightClick:(UIButton *)sender{
     
-    if (sender.selected) {//点击保存
+    if (sender.selected) {//点击保
         
         [self enterEditing:NO];
         
