@@ -9,13 +9,13 @@
 #import "SZYRegViewController.h"
 #import "SZYInputText.h"
 #import "SZYMenuButton.h"
-#import "SZYViewShaker.h"
+#import "AFViewShaker.h"
 #import "UITextField+Validator.m"
 
 @interface SZYRegViewController ()<UITextFieldDelegate>
 
-//左上角返回按钮
-@property (nonatomic, strong) UIButton    *backBtn;
+
+
 //输入框
 @property (nonatomic, strong) UITextField *phoneTextField;
 @property (nonatomic, strong) UITextField *nickNameTextField;
@@ -39,15 +39,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    //初始化导航条上的内容
-    [self setNavigationItem];
+    self.view.backgroundColor = UIColorFromRGB(0xf4f4f4);
+    //去掉右上角按钮
+    self.navigationItem.rightBarButtonItem = nil;
     //初始化UI
     [self setUP];
     
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
 }
 
 #pragma mark - UITextFieldDelegate
@@ -139,17 +142,7 @@
 }
 #pragma mark - 私有方法
 
--(void)setNavigationItem{
-    
-    self.title = @"注册";
-    self.navigationItem.rightBarButtonItem = nil;
-    
-    _backBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _backBtn.frame = CGRectMake(0, 0, SIZ(20), SIZ(20));
-    [_backBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-    [_backBtn addTarget:self action:@selector(back:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_backBtn];
-}
+
 
 -(void)back:(UIButton *)sender{
     [self.navigationController popViewControllerAnimated:YES];
@@ -157,7 +150,7 @@
 
 -(void)setUP{
     
-    self.view.backgroundColor = UIColorFromRGB(0xf4f4f4);
+    
     
     UIView* vLogin = [[UIView alloc] initWithFrame:CGRectMake(SIZ(15), SIZ(50), UIScreenWidth - SIZ(30), SIZ(300))];
     vLogin.layer.borderWidth = 0.5;
@@ -217,7 +210,7 @@
     _regBtn = [SZYMenuButton buttonWithType:UIButtonTypeCustom];
     [_regBtn setBackgroundImage:[UIImage imageNamed:@"btn_bg_blue"] forState:UIControlStateNormal];
     _regBtn.frame = CGRectMake(SIZ(30), CGRectGetMaxY(vLogin.frame) + SIZ(20), UIScreenWidth-SIZ(60), SIZ(50));
-    [_regBtn setTitle:@"注 册" forState:UIControlStateNormal];
+    [_regBtn setTitle:@"注   册" forState:UIControlStateNormal];
     [_regBtn addTarget:self action:@selector(regClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_regBtn];
     
@@ -258,16 +251,16 @@
                         [self showAlertWithMsg:@"请输入11位有效手机号码"];
                     }
                 }else{
-                    [[[SZYViewShaker alloc]initWithView:_pswConfirmTextField] shake];
+                    [[[AFViewShaker alloc]initWithView:_pswConfirmTextField] shake];
                 }
             }else{
-                [[[SZYViewShaker alloc]initWithView:_pswTextField] shake];
+                [[[AFViewShaker alloc]initWithView:_pswTextField] shake];
             }
         }else{
-            [[[SZYViewShaker alloc]initWithView:_nickNameTextField] shake];
+            [[[AFViewShaker alloc]initWithView:_nickNameTextField] shake];
         }
     }else{
-        [[[SZYViewShaker alloc]initWithView:_phoneTextField] shake];
+        [[[AFViewShaker alloc]initWithView:_phoneTextField] shake];
     }
 }
 
@@ -276,6 +269,10 @@
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:msg delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
     [alert show];
 }
+
+
+#pragma mark - getters
+
 
 
 @end

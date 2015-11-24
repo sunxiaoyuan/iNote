@@ -136,7 +136,6 @@
 		2BBC7F161BCCA9F900815AC0 /* SZYLgoinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F151BCCA9F900815AC0 /* SZYLgoinViewController.m */; };
 		2BBC7F1B1BCCEEB700815AC0 /* SZYRegViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F1A1BCCEEB700815AC0 /* SZYRegViewController.m */; };
 		2BBC7F531BCD613500815AC0 /* UITextField+Validator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F521BCD613500815AC0 /* UITextField+Validator.m */; };
-		2BBC7F561BCDFA5000815AC0 /* SZYViewShaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F551BCDFA5000815AC0 /* SZYViewShaker.m */; };
 		2BBC7F591BCE254800815AC0 /* UIView+SZY.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F581BCE254800815AC0 /* UIView+SZY.m */; };
 		2BBC7F5C1BCE2BD000815AC0 /* SZYInputText.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F5B1BCE2BD000815AC0 /* SZYInputText.m */; };
 		2BBC7F5F1BCE525B00815AC0 /* SZYPersonalCenterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F5E1BCE525B00815AC0 /* SZYPersonalCenterViewController.m */; };
@@ -163,6 +162,7 @@
 		2BCFF46D1BD8B071003A2F68 /* SZYNoteDisplayCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2BCFF46B1BD8B071003A2F68 /* SZYNoteDisplayCell.xib */; };
 		2BDBC5221BCBB41B00ED97AF /* UIStoryboard+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BDBC51F1BCBB41B00ED97AF /* UIStoryboard+Addition.m */; };
 		2BDBC5231BCBB41B00ED97AF /* UIViewController+Create.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BDBC5201BCBB41B00ED97AF /* UIViewController+Create.m */; };
+		CC0D0CFB1C02FF5D0046C729 /* AFViewShaker.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0D0CFA1C02FF5C0046C729 /* AFViewShaker.m */; };
 		CC6A18981BE75C5800DE41FF /* SZYchooseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6A18961BE75C5800DE41FF /* SZYchooseCell.m */; };
 		CC6A18991BE75C5800DE41FF /* SZYchooseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC6A18971BE75C5800DE41FF /* SZYchooseCell.xib */; };
 		CCD3B9B41BEA007E00D8A94B /* SZYPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD3B9B21BEA007E00D8A94B /* SZYPlayerViewController.m */; };
@@ -452,8 +452,6 @@
 		2BBC7F1A1BCCEEB700815AC0 /* SZYRegViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYRegViewController.m; sourceTree = "<group>"; };
 		2BBC7F511BCD613500815AC0 /* UITextField+Validator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+Validator.h"; sourceTree = "<group>"; };
 		2BBC7F521BCD613500815AC0 /* UITextField+Validator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+Validator.m"; sourceTree = "<group>"; };
-		2BBC7F541BCDFA5000815AC0 /* SZYViewShaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYViewShaker.h; sourceTree = "<group>"; };
-		2BBC7F551BCDFA5000815AC0 /* SZYViewShaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYViewShaker.m; sourceTree = "<group>"; };
 		2BBC7F571BCE254800815AC0 /* UIView+SZY.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+SZY.h"; sourceTree = "<group>"; };
 		2BBC7F581BCE254800815AC0 /* UIView+SZY.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+SZY.m"; sourceTree = "<group>"; };
 		2BBC7F5A1BCE2BD000815AC0 /* SZYInputText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYInputText.h; sourceTree = "<group>"; };
@@ -497,6 +495,8 @@
 		2BDBC51F1BCBB41B00ED97AF /* UIStoryboard+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIStoryboard+Addition.m"; sourceTree = "<group>"; };
 		2BDBC5201BCBB41B00ED97AF /* UIViewController+Create.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Create.m"; sourceTree = "<group>"; };
 		2BDBC5211BCBB41B00ED97AF /* UIViewController+Create.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Create.h"; sourceTree = "<group>"; };
+		CC0D0CF91C02FF5C0046C729 /* AFViewShaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFViewShaker.h; sourceTree = "<group>"; };
+		CC0D0CFA1C02FF5C0046C729 /* AFViewShaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFViewShaker.m; sourceTree = "<group>"; };
 		CC6A18951BE75C5700DE41FF /* SZYchooseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYchooseCell.h; sourceTree = "<group>"; };
 		CC6A18961BE75C5800DE41FF /* SZYchooseCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYchooseCell.m; sourceTree = "<group>"; };
 		CC6A18971BE75C5800DE41FF /* SZYchooseCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SZYchooseCell.xib; sourceTree = "<group>"; };
@@ -620,6 +620,7 @@
 		2B2670FC1BBA77DC00937B8C /* ThirdPartTools */ = {
 			isa = PBXGroup;
 			children = (
+				CC0D0CF81C02FF5C0046C729 /* AFViewShaker */,
 				2B76C3C01BE1C157006B2B6E /* FastCoder */,
 				2B6208481BD0D905005E4039 /* RSKImageCropper */,
 				2B6208391BD0D53B005E4039 /* MBProgressHUD */,
@@ -1279,8 +1280,6 @@
 		2BBC7F111BCCA98000815AC0 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				2BBC7F541BCDFA5000815AC0 /* SZYViewShaker.h */,
-				2BBC7F551BCDFA5000815AC0 /* SZYViewShaker.m */,
 				2BBC7F5A1BCE2BD000815AC0 /* SZYInputText.h */,
 				2BBC7F5B1BCE2BD000815AC0 /* SZYInputText.m */,
 				2B83034B1BD4D394004C4575 /* SZYSwitch.h */,
@@ -1382,6 +1381,15 @@
 				2B44D1E31BC7FBEC00B1B4F0 /* SZYCommonToolClass.m */,
 			);
 			name = CommonTools;
+			sourceTree = "<group>";
+		};
+		CC0D0CF81C02FF5C0046C729 /* AFViewShaker */ = {
+			isa = PBXGroup;
+			children = (
+				CC0D0CF91C02FF5C0046C729 /* AFViewShaker.h */,
+				CC0D0CFA1C02FF5C0046C729 /* AFViewShaker.m */,
+			);
+			path = AFViewShaker;
 			sourceTree = "<group>";
 		};
 		CCD3BA551BF0FABD00D8A94B /* Memento */ = {
@@ -1580,6 +1588,7 @@
 				2B2671751BBA79D500937B8C /* MJRefreshAutoStateFooter.m in Sources */,
 				2B6208471BD0D53B005E4039 /* UIImageView+MJWebCache.m in Sources */,
 				2B44D20A1BC7FCF300B1B4F0 /* SDWebImageCompat.m in Sources */,
+				CC0D0CFB1C02FF5D0046C729 /* AFViewShaker.m in Sources */,
 				2B44D18A1BC7681100B1B4F0 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
 				2B44D20F1BC7FCF300B1B4F0 /* SDWebImagePrefetcher.m in Sources */,
 				2B44D1891BC7681100B1B4F0 /* NSArray+MASAdditions.m in Sources */,
@@ -1639,7 +1648,6 @@
 				2B44D1101BC6D50000B1B4F0 /* SZYSettingViewController.m in Sources */,
 				CCD3BA1E1BED05F800D8A94B /* SZYNoteBookSolidater.m in Sources */,
 				2B44D2141BC7FCF300B1B4F0 /* UIImageView+HighlightedWebCache.m in Sources */,
-				2BBC7F561BCDFA5000815AC0 /* SZYViewShaker.m in Sources */,
 				2BCFF4531BD7372E003A2F68 /* SZYDetailViewController.m in Sources */,
 				2B44D1AC1BC7A6E400B1B4F0 /* MJType.m in Sources */,
 				CCD3B9B41BEA007E00D8A94B /* SZYPlayerViewController.m in Sources */,

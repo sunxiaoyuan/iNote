@@ -3,7 +3,7 @@
 //  iNote
 ////////////////////////////////////////////////////////////////////////
 //
-//                     祖国万岁!   没有bug!
+//                      祖国万岁! 老婆万岁！没有bug!
 //
 ////////////////////////////////////////////////////////////////////////
 //  Created by 孙中原 on 15/9/29.
@@ -40,7 +40,7 @@
     SZYNotesViewController *notesVC = [[SZYNotesViewController alloc]init];
     SZYFavoriteViewController *favVC = [[SZYFavoriteViewController alloc]init];
     SZYSettingViewController *setVC = [[SZYSettingViewController alloc]init];
-    SZYLgoinViewController *logVC = [[SZYLgoinViewController alloc]init];
+    SZYLgoinViewController *logVC = [[SZYLgoinViewController alloc] initWithTitle:@"登录" BackButton:NO];
     NSArray *vcArr = @[homeVC,notesVC,favVC,setVC,logVC];
     
     for (int i = 0; i < [vcArr count]; i ++) {
@@ -110,7 +110,6 @@
     self.showViewController = newNC.childViewControllers[0];
     //触发点击遮罩的方法,恢复界面
     [self.showViewController recoverInterface];
-    
 }
 
 #pragma mark - 私有方法

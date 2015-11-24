@@ -131,7 +131,7 @@
 //
 //            }else{
             
-                SZYLgoinViewController *loginVC = [[SZYLgoinViewController alloc]init];
+                SZYLgoinViewController *loginVC = [[SZYLgoinViewController alloc]initWithTitle:@"登录" BackButton:YES];
                 [self.navigationController pushViewController:loginVC animated:YES];
 //            }
         }

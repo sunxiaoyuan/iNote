@@ -7,6 +7,7 @@
 //
 
 #import "UIBarButtonItem+SZYBarButtonItem.h"
+#import "SZYMenuButton.h"
 
 @implementation UIBarButtonItem (SZYBarButtonItem)
 
@@ -14,7 +15,7 @@
 {
     UIImage *normalImage = [UIImage imageNamed:image];
     
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    SZYMenuButton *btn = [[SZYMenuButton alloc]init];
     btn.frame = CGRectMake(0, 0, 20, 20);
     [btn setBackgroundImage:normalImage forState:UIControlStateNormal];
     [btn addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
@@ -27,7 +28,7 @@
 {
     UIImage *normalImage = [UIImage imageNamed:image];
     
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    SZYMenuButton *btn = [[SZYMenuButton alloc]init];
     btn.frame = CGRectMake(0, 0, 35, 35);
     [btn setBackgroundImage:normalImage forState:UIControlStateNormal];
     [btn addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
@@ -39,7 +40,7 @@
 {
     UIImage *normalImage = [UIImage imageNamed:image];
     
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    SZYMenuButton *btn = [[SZYMenuButton alloc]init];
     btn.frame = CGRectMake(0, 0, width, height);
     [btn setBackgroundImage:normalImage forState:UIControlStateNormal];
     [btn addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
@@ -49,7 +50,7 @@
 
 + (UIBarButtonItem *)initWithTitle:(NSString *)title titleColor:(UIColor *)titleColor target:(id)target action:(SEL)action
 {
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    SZYMenuButton *btn = [[SZYMenuButton alloc]init];
     btn.frame = CGRectMake(0, 0, 40, 40);
     [btn setTitle:title forState:UIControlStateNormal];
     [btn setTitleColor:titleColor forState:UIControlStateNormal];

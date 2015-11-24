@@ -15,9 +15,10 @@ typedef void (^coverDidRomove)();
 @property (nonatomic, strong) UIButton       *hudBtn;//遮盖按钮
 @property (nonatomic, strong) coverDidRomove coverDidRomove;
 @property (nonatomic, assign) BOOL           isScale;//是否缩放
+@property (nonatomic, assign) BOOL     isNeedBack;
 
 //初始化方法
-- (instancetype)initWithBackButton:(BOOL)isNeedBack;
+- (instancetype)initWithTitle:(NSString *)title  BackButton:(BOOL)isNeedBack;
 
 - (void)recoverInterface;
 - (void)leftMenuClick;

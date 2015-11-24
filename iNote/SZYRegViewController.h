@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 sunzhongyuan. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "SZYBaseViewController.h"
 
-@interface SZYRegViewController : UIViewController
+@interface SZYRegViewController : SZYBaseViewController
 
 @end

@@ -8,20 +8,20 @@
 
 #import "SZYBaseViewController.h"
 
-#define SZYScaleAnimateWithDuration 0.3
+static NSTimeInterval const kScaleAnimateWithDuration = 0.3;
+
 
 @interface SZYBaseViewController ()
-
-@property (nonatomic, assign) BOOL     isNeedBack;
 
 @end
 
 @implementation SZYBaseViewController
 
-- (instancetype)initWithBackButton:(BOOL)isNeedBack
+- (instancetype)initWithTitle:(NSString *)title  BackButton:(BOOL)isNeedBack
 {
     self = [super init];
     if (self) {
+        self.title = title;
         _isNeedBack = isNeedBack;
     }
     return self;
@@ -59,12 +59,13 @@
     CGFloat moveX = UIScreenWidth - UIScreenWidth * SZYZoomScaleRight;
     
     //进行动画
-    [UIView animateWithDuration:SZYScaleAnimateWithDuration animations:^{
+    [UIView animateWithDuration:kScaleAnimateWithDuration animations:^{
         
         //创建缩放矩阵仿射对象
         CGAffineTransform transform = CGAffineTransformMakeScale(zoomScale, zoomScale);
         //移动矩阵仿射对象
         self.navigationController.view.transform = CGAffineTransformTranslate(transform, moveX, 0);
+
         //将状态改成已经缩放
         self.isScale = YES;
     }];
@@ -81,7 +82,7 @@
 // 遮盖点击,恢复界面
 - (void)recoverInterface
 {
-    [UIView animateWithDuration:SZYScaleAnimateWithDuration animations:^{
+    [UIView animateWithDuration:kScaleAnimateWithDuration animations:^{
         
         self.navigationController.view.transform = CGAffineTransformIdentity;
         
