@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////
 //  Created by 孙中原 on 15/9/29.
 //  Copyright (c) 2015年 sunzhongyuan. All rights reserved.
-//  程序主入口，实现一个自定义标签控制器
+//  程序主入口，实现一个自定义标签控制器-_-
 
 #import "SZYMainViewController.h"
 #import "SZYIntroView.h"
