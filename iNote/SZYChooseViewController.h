@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 @class SZYNoteBookModel;
+@class SZYNoteModel;
 
 @protocol SZYChooseViewControllerDelegate <NSObject>
 
 @required
--(void)didChooseNoteBook:(SZYNoteBookModel *)noteBookSelected AtRow:(NSInteger)row;
+-(void)didChooseNoteBook:(SZYNoteBookModel *)noteBookSelected;
 
 @end
 
@@ -20,6 +21,6 @@
 
 @property (nonatomic, assign) id<SZYChooseViewControllerDelegate> delegate;
 
-- (instancetype)initWithSelectedRow:(NSInteger)row;
+- (instancetype)initWithCurrentNote:(SZYNoteModel *)note;
 
 @end

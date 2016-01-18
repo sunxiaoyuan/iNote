@@ -9,17 +9,14 @@
 #import <UIKit/UIKit.h>
 
 @protocol SZYOpenListViewDelegate <NSObject>
-
--(void)haveTouchedShadowView;
+//点击下拉列表或者阴影部分
+-(void)openListShouldDisappear:(NSInteger)selectedIndex;
 
 @end
 
 @interface SZYOpenListView : UIView
 
-@property (nonatomic, copy  ) NSMutableArray          *noteBookListData;//数据源
-@property (nonatomic, assign) NSInteger               selectedIndex;
 @property (nonatomic, assign) id<SZYOpenListViewDelegate> delegate;
-
 -(void)refreshOpenList:(NSMutableArray *)dataArr;
-
+-(void)makeTranslateAnimation:(BOOL)isUp;
 @end

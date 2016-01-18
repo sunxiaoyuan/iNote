@@ -50,8 +50,8 @@ static NSTimeInterval const kScaleAnimateWithDuration = 0.3;
 
 -(void)leftMenuClick{
     
-    //添加遮盖,拦截用户操作
-    [self.navigationController.view addSubview:self.hudBtn];
+    //添加遮罩
+    [self addHub];
     
     //缩放比例
     CGFloat zoomScale = (UIScreenHeight - SZYScaleTopMargin * 2) / UIScreenHeight;
@@ -87,14 +87,26 @@ static NSTimeInterval const kScaleAnimateWithDuration = 0.3;
         self.navigationController.view.transform = CGAffineTransformIdentity;
         
     } completion:^(BOOL finished) {
-        [self.hudBtn removeFromSuperview];
-        self.hudBtn = nil;
+        
+        [self removeHub];
         self.isScale = NO;
-        //当遮盖按钮被销毁时调用
-        if (_coverDidRomove) {
-            _coverDidRomove();
-        }
+//        //当遮盖按钮被销毁时调用
+//        if (_coverDidRomove) {
+//            _coverDidRomove();
+//        }
     }];
+}
+
+#pragma mark - 公开方法
+-(void)addHub{
+    //添加遮盖,拦截用户操作
+    [self.navigationController.view addSubview:self.hudBtn];
+
+}
+
+-(void)removeHub{
+    [self.hudBtn removeFromSuperview];
+    self.hudBtn = nil;
 }
 
 #pragma mark - getters

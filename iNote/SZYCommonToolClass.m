@@ -163,7 +163,7 @@
     
 }
 
-- (CGSize)getStringRectInTextView:(NSString *)string InTextView:(UITextView *)textView{
+- (CGSize)resizeTextView:(UITextView *)textView{
     
     //实际textView显示时我们设定的宽
     CGFloat contentWidth = CGRectGetWidth(textView.frame);
@@ -185,7 +185,7 @@
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
     paragraphStyle.lineBreakMode = textView.textContainer.lineBreakMode;
     NSDictionary *dic = @{NSFontAttributeName:textView.font, NSParagraphStyleAttributeName:[paragraphStyle copy]};
-    CGSize calculatedSize =  [string boundingRectWithSize:InSize options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:dic context:nil].size;
+    CGSize calculatedSize =  [textView.text boundingRectWithSize:InSize options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:dic context:nil].size;
     
     CGSize adjustedSize = CGSizeMake(ceilf(calculatedSize.width),calculatedSize.height + broadHeight);
     return adjustedSize;

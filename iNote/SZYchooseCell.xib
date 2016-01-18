@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -16,21 +16,18 @@
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JkC-mG-yrQ">
                         <rect key="frame" x="18" y="8" width="238" height="27"/>
-                        <animations/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="correct" translatesAutoresizingMaskIntoConstraints="NO" id="1jW-SA-PtN">
                         <rect key="frame" x="291" y="14" width="16" height="16"/>
-                        <animations/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="VX8-2A-eua"/>
                             <constraint firstAttribute="height" constant="16" id="skv-gy-WDf"/>
                         </constraints>
                     </imageView>
                 </subviews>
-                <animations/>
                 <constraints>
                     <constraint firstItem="JkC-mG-yrQ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="18" id="0Sz-Q2-XSX"/>
                     <constraint firstAttribute="trailing" secondItem="JkC-mG-yrQ" secondAttribute="trailing" constant="64" id="2Kf-Ye-Mdu"/>
@@ -41,12 +38,11 @@
                     <constraint firstItem="JkC-mG-yrQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="hHf-We-xiY"/>
                 </constraints>
             </tableViewCellContentView>
-            <animations/>
             <connections>
                 <outlet property="indicatorImageView" destination="1jW-SA-PtN" id="nHd-1m-EIx"/>
                 <outlet property="titleLabel" destination="JkC-mG-yrQ" id="Ytw-Ho-ThK"/>
             </connections>
-            <point key="canvasLocation" x="460" y="251"/>
+            <point key="canvasLocation" x="108" y="279"/>
         </tableViewCell>
     </objects>
     <resources>

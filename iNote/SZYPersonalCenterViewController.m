@@ -193,7 +193,7 @@
             UIImage *imge = [info objectForKey:UIImagePickerControllerEditedImage];
             //存储图片到本地
             self.finalAvater = imge;
-            [self.currentUser saveAvater:imge IsFake:YES];
+            [self.currentUser saveAvater:imge];
             
             //改变界面头像图片
 //            self.blurImageView.image = [self.commTools blurImageWithImage:imge];
@@ -312,7 +312,7 @@
 
 - (void)imageCropViewController:(RSKImageCropViewController *)controller didCropImage:(UIImage *)croppedImage usingCropRect:(CGRect)cropRect {
     
-    [self.currentUser saveAvater:croppedImage IsFake:YES];
+    [self.currentUser saveAvater:croppedImage];
     self.finalAvater = croppedImage;
     self.avaterImageView.image = croppedImage;
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -385,6 +385,7 @@
 
 #pragma mark - textViewDelegate
 -(void)textViewDidBeginEditing:(UITextView *)textView{
+    //获得光标，立即清除默认内容
     if ([textView.text isEqualToString:self.defaultMsg]) {
         textView.text = @"";
     }
@@ -393,6 +394,7 @@
 }
 
 -(void)textViewDidEndEditing:(UITextView *)textView{
+    //结束输入后，检测如果没有输入，那么给一个默认字符串
     if ([textView.text isEqualToString:@""]) {
         textView.text = self.defaultMsg;
     }
@@ -439,13 +441,13 @@
         //保存数据
         self.currentUser.user_nickname = self.infoNickTextField.text;
         self.currentUser.user_sex = self.sexSwitch.on ? @"Man":@"Woman";
-        [self.currentUser saveAvater:self.finalAvater IsFake:NO];
-        [self.currentUser saveImages:self.photoArray IsFake:NO];
+        [self.currentUser saveAvater:self.finalAvater];
+        [self.currentUser saveImages:self.photoArray];
         self.currentUser.user_status = self.internalTextView.text;
 
         ApplicationDelegate.userSession = self.currentUser;
         //固化
-        [ApplicationDelegate.userSession solidateDataWithKey:@"user_session"];
+        [ApplicationDelegate.userSession solidateDataWithKey:UDUserSession];
         
         [self initData];
         

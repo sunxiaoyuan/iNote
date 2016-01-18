@@ -13,4 +13,6 @@
 
 +(NSString *)szyTimeStamp;
 
++(long)currentTimeStampWithLongFormat;
+
 @end

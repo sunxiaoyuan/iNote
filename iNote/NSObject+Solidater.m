@@ -17,5 +17,10 @@
     
 }
 
++(id)unsolidateByKey:(NSString *)key{
+    
+    return [[SZYDataSolidater sharedInstance] dataByKey:key];
+}
+
 
 @end

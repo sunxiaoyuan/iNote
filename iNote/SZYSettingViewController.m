@@ -15,24 +15,22 @@
 #import "SZYPersonalCenterViewController.h"
 #import "SZYLocalFileManager.h"
 #import "SZYUser.h"
+#import "UIAlertController+SZYKit.h"
 
 
 
-@interface SZYSettingViewController ()<UIAlertViewDelegate>
+@interface SZYSettingViewController ()
 
 @property (nonatomic, strong) UIView *bottomView;
 @property (nonatomic, strong) UIView *sepLineView;
 
-//点击手势
-@property (nonatomic, strong) UITapGestureRecognizer *tap;
+
 //个人中心
 @property (nonatomic, strong) SZYSettingView         *personalCenterView;
 //清理缓存
 @property (nonatomic, strong) SZYSettingView         *cleanCacheView;
 //注销按钮
 @property (nonatomic, strong) SZYMenuButton          *logoutBtn;
-//缓存弹出提示框
-@property (nonatomic, strong) UIAlertView            *alertView;
 
 @property (nonatomic, strong) SZYLocalFileManager    *fileManager;
 
@@ -43,7 +41,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"设置";
     self.view.backgroundColor = UIColorFromRGB(0xf4f4f4);
     self.navigationItem.rightBarButtonItem = nil;
     self.fileManager = [SZYLocalFileManager sharedInstance];
@@ -54,12 +51,6 @@
     [self.bottomView addSubview:self.cleanCacheView];
     [self.bottomView addSubview:self.sepLineView];
     [self.view addSubview:self.logoutBtn];
-    
-    UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
-    [self.personalCenterView addGestureRecognizer:tap1];
-    UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
-    [self.personalCenterView addGestureRecognizer:tap1];
-    [self.cleanCacheView addGestureRecognizer:tap2];
    
 }
 
@@ -81,43 +72,13 @@
 
     self.logoutBtn.frame = CGRectMake((UIScreenWidth-270)/2, CGRectGetMaxY(self.bottomView.frame)+24, 270, 45);
     
-//    //添加view
-//    CGFloat viewW = UIScreenWidth * 0.88;
-//    CGFloat viewX = UIScreenWidth * 0.12 / 2;
-//    CGFloat viewH = SIZ(50);
-//    CGFloat viewY = SIZ(40);
-//    [self viewAddSetingViewWithSetingView:self.personalCenterView frame:CGRectMake(viewX, viewY, viewW, viewH) tag:SZYSetingViewTypePersonalCenter];
-//    [self viewAddSetingViewWithSetingView:self.cleanCacheView frame:CGRectMake(viewX, viewY + viewH + SIZ(2), viewW, viewH) tag:SZYSetingViewTypeCleanCache];
-//    
-//    
-//    
     //设置“退出登录”是否出现
     self.logoutBtn.hidden = !ApplicationDelegate.isLoggedin;
     
-    
 }
 
-#pragma mark - UIAlertViewDelegate
+#pragma mark - 响应方法
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex) {
-        
-        //清除temp文件夹下所有缓存
-        [self.fileManager cleanTempFolder];
-    }
-    self.alertView = nil;
-}
-
-#pragma mark - 私有方法
-- (void)viewAddSetingViewWithSetingView:(SZYSettingView *)view frame:(CGRect)frame tag:(SZYSetingViewType)tag{
-    view.frame = frame;
-    view.tag = tag;
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
-    [view addGestureRecognizer:tap];
-}
-
-//view被点击
 - (void)viewClick:(UITapGestureRecognizer *)tap{
     //判断点击了那个view
     switch (tap.view.tag){
@@ -142,10 +103,18 @@
         {
             //获得temp文件夹下的缓存文件大小
             float chacheSize = [self.fileManager fileSizeAtTempFolder];
-            self.alertView = [[UIAlertView alloc] initWithTitle:@"清理缓存" message:[NSString stringWithFormat:@"缓存大小为%.2fM,确定要清理缓存吗?", chacheSize] delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-            [self.alertView show];
-            self.alertView.delegate = self;
-            
+            [UIAlertController showAlertAtViewController:self withTitle:@"清除缓存" withMessage:[NSString stringWithFormat:@"缓存大小为%.2fM,确定要清理缓存吗?", chacheSize] cancelTitle:@"取消" confirmTitle:@"确定" confirmHandler:^(UIAlertAction *action){
+                //异步清除文件缓存
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [self.fileManager cleanTempFolderHandler:^(NSError *error) {
+                        if (!error) {
+                            NSLog(@"文件清理结果：成功！");
+                        }else {
+                            NSLog(@"文件清理失败:%@",[error localizedDescription]);
+                        }
+                    }];
+                });
+            }];
         }
             break;
             
@@ -179,17 +148,12 @@
 }
 
 
--(UITapGestureRecognizer *)tap{
-    if (!_tap){
-        _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
-    }
-    return _tap;
-}
-
 -(SZYSettingView *)personalCenterView{
     if (!_personalCenterView){
         _personalCenterView = [SZYSettingView settingViewWithTitle:@"个人中心"];
         _personalCenterView.tag = SZYSetingViewTypePersonalCenter;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
+        [_personalCenterView addGestureRecognizer:tap];
     }
     return _personalCenterView;
 }
@@ -198,6 +162,8 @@
     if (!_cleanCacheView){
         _cleanCacheView = [SZYSettingView settingViewWithTitle:@"清理缓存"];
         _cleanCacheView.tag = SZYSetingViewTypeCleanCache;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewClick:)];
+        [_cleanCacheView addGestureRecognizer:tap];
     }
     return _cleanCacheView;
 }

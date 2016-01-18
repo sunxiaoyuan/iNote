@@ -30,7 +30,6 @@ static SZYDataSolidater *solidater = nil;
     }
     
     return solidater;
- 
 }
 
 - (instancetype)init
@@ -49,33 +48,26 @@ static SZYDataSolidater *solidater = nil;
         return self;
     }
     else{
-        
         return nil;
     }
-  
 }
-
-#pragma mark - 
 
 - (void)solidateData:(id)data withKey:(NSString *)key{
     
-    NSParameterAssert(data);
-    NSParameterAssert(key);
-    //当前的固化策略是 ：NSUserDefaults存储
+    //当前的固化策略是 ：针对NSData的NSUserDefaults存储
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *solidData = [FastCoder dataWithRootObject:data];
     if (solidData) {
         
-        [[NSUserDefaults standardUserDefaults]setObject:solidData forKey:key];
-        [[NSUserDefaults standardUserDefaults]synchronize];
+        [defaults setObject:solidData forKey:key];
+        [defaults synchronize];
     }
 }
 
 - (id)dataByKey:(NSString *)key{
     
-    NSParameterAssert(key);
-    NSData *data = [[NSUserDefaults standardUserDefaults]objectForKey:key];
+    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:key];
     return [FastCoder objectWithData:data];
 }
-
 
 @end

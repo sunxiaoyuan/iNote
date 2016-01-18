@@ -42,10 +42,6 @@
  *
  */
 -(UIImage *)blurImageWithImage:(UIImage *)inputImage;
-/**
- *  计算textview文本尺寸
- *
- */
--(CGSize)getStringRectInTextView:(NSString *)string InTextView:(UITextView *)textView;
+
 
 @end

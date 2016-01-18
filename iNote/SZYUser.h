@@ -32,8 +32,8 @@
 - (instancetype)initWithPhoneNumber:(NSString *)phoneNumber AndUserID:(NSString *)user_id;
 -(void)cleanLocalSaveData;
 
--(void)saveAvater:(UIImage *)img IsFake:(BOOL)isFake;
--(void)saveImages:(NSMutableArray *)imgArr IsFake:(BOOL)isFake;
+-(void)saveAvater:(UIImage *)img;
+-(void)saveImages:(NSMutableArray *)imgArr;
 
 -(NSMutableArray *)photosAtLocal;
 -(UIImage *)avaterAtLocal;

@@ -7,48 +7,67 @@
 //
 
 #import "SZYNoteModel.h"
-#import "MJExtension.h"
-
+#import "FMResultSet.h"
 
 @implementation SZYNoteModel
 
+
+#pragma mark - 重写父类方法
 +(instancetype)modelWithDict:(NSDictionary *)dict{
     
     SZYNoteModel *noteModel = [SZYNoteModel objectWithKeyValues:dict];
     return noteModel;
 }
 
-
-+(id)modalWithID{
-    
-    SZYNoteModel *note = [[SZYNoteModel alloc]init];
-    note.note_id = [NSString RandomString];
-    return note;
-    
+#pragma mark - 子类扩展的初始化方法
+- (instancetype)initWithNoteBookID:(NSString *)noteBook_id_belonged UserID:(NSString *)user_id_belonged Title:(NSString *)title
+{
+    self = [super init];
+    if (self) {
+        _note_id = [NSString stringOfUUID];
+        _noteBook_id_belonged = noteBook_id_belonged;
+        _user_id_belonged = user_id_belonged;
+        _title = title;
+    }
+    return self;
 }
 
 #pragma mark - 本地资源写入方法
--(void)saveImage:(UIImage *)image IsFake:(BOOL)isFake{
+-(void)saveImage:(UIImage *)image {
     
     if (image) {
-        
-        self.image = [[SZYLocalFileManager sharedInstance] saveNoteImage:image NoteID:self.note_id IsFake:isFake];
+        [[SZYLocalFileManager sharedInstance] saveFile:image fileName:[NSString stringWithFormat:@"%@-%@.jpg",_note_id,kNoteImageFileSuffix] withType:kNoteImageFolderType successHandler:^(NSString *filePath) {
+            self.image = filePath;
+        } failureHandler:^(NSError *error) {
+            NSLog(@"%@",error);
+        }];
+    }else{
+        //当传递nil参数时，说明需要清除笔记图片，属性＋本地资源文件
+        [self deleteImageAtLocal:^(NSError *error) {
+            if (error) {
+                NSLog(@"%@",[error localizedDescription]);
+            }
+        }];
+        self.image = nil;
     }
 }
 
--(void)saveContent:(NSString *)content IsFake:(BOOL)isFake{
+-(void)saveContent:(NSString *)content {
     
     if (content) {
-        
-        self.content = [[SZYLocalFileManager sharedInstance] saveNoteContent:content NoteID:self.note_id isFake:isFake];
+        [[SZYLocalFileManager sharedInstance] saveFile:content fileName:[NSString stringWithFormat:@"%@-%@.txt",_note_id,kNoteContentFileSuffix] withType:kNoteContentFolderType successHandler:^(NSString *filePath) {
+            self.content = filePath;
+        } failureHandler:^(NSError *error) {
+            NSLog(@"%@",error);
+        }];
     }
 }
 
 -(NSString *)videoPath{
     
-    self.video = [[SZYLocalFileManager sharedInstance] noteVideoPathWithNoteID:self.note_id];
+    NSString *videoFileName = [NSString stringWithFormat:@"%@-%@.caf",_note_id,kNoteVideoFileSuffix];
+   self.video = [[[SZYLocalFileManager sharedInstance] setUpLocalFileDir:kNoteVideoFolderType] stringByAppendingPathComponent:videoFileName];
     return self.video;
-
 }
 
 #pragma mark - 读取本地资源方法
@@ -61,9 +80,37 @@
 
 -(UIImage *)imageAtlocal{
     
-    return [[SZYLocalFileManager sharedInstance] imageFileAtPath:self.image];
+    UIImage *image = [[SZYLocalFileManager sharedInstance] imageFileAtPath:self.image];
+    return image;
 }
 
+-(void)deleteVideoAtLocalWithDirClear:(BOOL)isDirClear{
+    
+    [[SZYLocalFileManager sharedInstance] deleteFileWithPath:self.video completionHandler:^(NSError *error) {
+        if (error) {
+            NSLog(@"%@",error);
+        }
+    }];
+    if (isDirClear) {
+        self.video = nil;
+    }
+}
+
+-(void)deleteContentAtLocal:(completedHandler)handler{
+    [[SZYLocalFileManager sharedInstance] deleteFileWithPath:self.content completionHandler:^(NSError *error) {
+        handler(error);
+    }];
+}
+
+-(void)deleteImageAtLocal:(completedHandler)handler{
+    [[SZYLocalFileManager sharedInstance] deleteFileWithPath:self.image completionHandler:^(NSError *error) {
+        handler(error);
+    }];
+}
+
+-(BOOL)haveVideo{
+    return (self.video && ![self.video isEqualToString:@""]);
+}
 
 
 @end

@@ -15,15 +15,12 @@
 @property (assign, nonatomic) CGFloat left;
 @property (assign, nonatomic) CGFloat right;
 
-
 @property (nonatomic, assign) CGFloat x;
 @property (nonatomic, assign) CGFloat y;
 @property (assign, nonatomic) CGPoint origin;
 
-
 @property (nonatomic, assign) CGFloat centerX;
 @property (nonatomic, assign) CGFloat centerY;
-
 
 @property (nonatomic, assign) CGFloat width;
 @property (nonatomic, assign) CGFloat height;

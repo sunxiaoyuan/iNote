@@ -12,7 +12,6 @@
 
 -(void)menuBtnDidClick:(UIButton *)sender;
 
-
 @end
 
 @interface SZYMenuView : UIView

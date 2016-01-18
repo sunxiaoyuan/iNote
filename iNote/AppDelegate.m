@@ -8,12 +8,14 @@
 
 #import "AppDelegate.h"
 #import "SZYNoteBookModel.h"
-#import "SZYNoteBookLocalmanager.h"
 #import "SZYLocalFileManager.h"
 #import "SZYUser.h"
+#import "FMDatabaseQueue.h"
+#import "SZYNoteModel.h"
+#import "SZYNoteBookModel.h"
 
 @interface AppDelegate ()
-
+@property (nonatomic ,strong) SZYNoteModel *tempNote;
 @end
 
 @implementation AppDelegate
@@ -22,7 +24,11 @@
     
     //修改控制器的tatusBar样式,需要注意在info.plist里配置一下
     [application setStatusBarStyle:UIStatusBarStyleLightContent];
-    
+    //加载数据库路径
+    self.dbasePath = [[SZYLocalFileManager sharedInstance] createDataBaseLocalFileDir];
+    //加载数据库安全队列
+    //一般在App中应该保持一个FMDatabaseQueue的实例，并在所有的线程中都只使用这一个实例。这里我们选择AppDelegate这个单例持有这个实例，可以实现这一需求
+    self.dbQueue = [FMDatabaseQueue databaseQueueWithPath:self.dbasePath];
     //初始化本地信息
     [self setUpLocalInfo];
    
@@ -31,21 +37,18 @@
 
 -(void)setUpLocalInfo{
     
-//    NSString *documents = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (![defaults objectForKey:@"user_session"]) {
+    if (![defaults objectForKey:UDUserSession]) {
         //创建临时用户
-        self.userSession = [[SZYUser alloc]initWithPhoneNumber:@"TempUser" AndUserID:@"TempUser"];
-        [self.userSession solidateDataWithKey:@"user_session"];
-        //为临时用户创建本地目录
+        self.userSession = [[SZYUser alloc]initWithPhoneNumber:TempUserPhoneNumber AndUserID:TempUserID];
+        [self.userSession solidateDataWithKey:UDUserSession];
+        //为临时用户创建本地一级目录
         [[SZYLocalFileManager sharedInstance] setUpLocalFileDir:kUserFolderType];
         self.isLoggedin = NO;
     } else {
         //从本地读取用户信息
-        NSData *data = [defaults objectForKey:@"user_session"];
-        self.userSession = [FastCoder objectWithData:data];
-        self.isLoggedin = ![self.userSession.user_id isEqualToString:@"TempUser"];
+        self.userSession = [SZYUser unsolidateByKey:UDUserSession];
+        self.isLoggedin = ![self.userSession.user_id isEqualToString:TempUserID];
     }
     //创建默认笔记本
     [self createDefaultNoteBook];
@@ -53,18 +56,27 @@
 
 -(void)createDefaultNoteBook{
     
-    SZYNoteBookLocalmanager *noteBookLM = (SZYNoteBookLocalmanager *)[SZYLocalManagerFactory managerFactoryWithType:kNoteBookType]; //工厂模式取得实例
-    noteBookLM.solidater = [SZYSolidaterFactory solidaterFctoryWithType:kNoteBookType];
-    //保证本地必须有默认文件夹
-    if (![noteBookLM modelById:kDEFAULT_NOTEBOOK_ID]) {
-        SZYNoteBookModel *defaultNoteBook = [[SZYNoteBookModel alloc]init];
-        defaultNoteBook.noteBook_id = kDEFAULT_NOTEBOOK_ID;
-        defaultNoteBook.title = @"默认笔记本";
-        defaultNoteBook.user_id_belonged = self.userSession.user_id;
-        defaultNoteBook.isPrivate = @"NO";
-        //保存“默认笔记本”
-        [noteBookLM save:defaultNoteBook];
-    }
+    SZYNoteBookSolidater *solidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
+    //思考这样一个情景：如果后台在执行大量的更新，而主线程也需要访问数据库，虽然要访问的数据量很少，但是在后台执行完之前，还是会阻塞主线程
+    //所以在大多数时候，应该把从主线程调用inDatabase和inTransaction放在异步里
+    //但是实际上，这种方式能解决不依赖于数据库返回的结果的情况，如果对返回结果有依赖，就需要考虑UI上的体验了
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self.dbQueue inDatabase:^(FMDatabase *db) {
+            //保证本地必须有默认文件夹
+            [solidater readOneByID:kDEFAULT_NOTEBOOK_ID successHandler:^(id result) {
+                if (!result) {
+                    SZYNoteBookModel *defaultNoteBook = [[SZYNoteBookModel alloc]initWithID:kDEFAULT_NOTEBOOK_ID Title:@"默认笔记本" UserID:self.userSession.user_id IsPrivate:@"NO"];
+                    [solidater saveOne:defaultNoteBook successHandler:^(id result) {
+                        
+                    } failureHandler:^(NSString *errorMsg) {
+                        NSLog(@"error = %@",errorMsg);
+                    }];
+                }
+            } failureHandler:^(NSString *errorMsg) {
+                NSLog(@"error = %@",errorMsg);
+            }];
+        }];
+    });
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

@@ -33,17 +33,17 @@
         //添加组件
         self.pictureBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.pictureBtn setBackgroundImage:[UIImage imageNamed:@"detail_picture"] forState:UIControlStateNormal];
-        [self.pictureBtn addTarget:self action:@selector(pictureBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.pictureBtn addTarget:self action:@selector(pictureBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.pictureBtn];
         
         self.videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.videoBtn setBackgroundImage:[UIImage imageNamed:@"detail_video"] forState:UIControlStateNormal];
-        [self.videoBtn addTarget:self action:@selector(videoBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.videoBtn addTarget:self action:@selector(videoBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.videoBtn];
         
         self.fontBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.fontBtn setBackgroundImage:[UIImage imageNamed:@"detail_font"] forState:UIControlStateNormal];
-        [self.fontBtn addTarget:self action:@selector(fontBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.fontBtn addTarget:self action:@selector(fontBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.fontBtn];
         
         self.hideKeyBoardBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -92,16 +92,16 @@
 
 #pragma mark - 点击响应事件
 
--(void)pictureBtnClick{
-    [self.delegate addPictureClick];
+-(void)pictureBtnClick:(UIButton *)sender{
+    [self.delegate addPictureClick:sender];
 }
 
--(void)videoBtnClick{
-    [self.delegate addVideoClick];
+-(void)videoBtnClick:(UIButton *)sender{
+    [self.delegate addVideoClick:sender];
 }
 
--(void)fontBtnClick{
-    [self.delegate adjustFontClick];
+-(void)fontBtnClick:(UIButton *)sender{
+    [self.delegate adjustFontClick:sender];
 }
 
 -(void)hideKeyBoardBtnClick{

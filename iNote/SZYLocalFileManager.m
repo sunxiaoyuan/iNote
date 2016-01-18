@@ -8,13 +8,12 @@
 
 #import "SZYLocalFileManager.h"
 
-
 @interface SZYLocalFileManager ()
 
-@property (nonatomic, strong) NSString *documentsDir;
-@property (nonatomic, strong) NSString *cacheDir;
-@property (nonatomic, strong) NSString *libraryDir;
-@property (nonatomic, strong) NSString *tempDir;
+@property (nonatomic, strong) NSString      *documentsDir;
+@property (nonatomic, strong) NSString      *cacheDir;
+@property (nonatomic, strong) NSString      *libraryDir;
+@property (nonatomic, strong) NSString      *tempDir;
 @property (nonatomic, strong) NSFileManager *manager;
 
 @end
@@ -22,7 +21,6 @@
 static SZYLocalFileManager *manager = nil;
 
 @implementation SZYLocalFileManager
-
 
 +(SZYLocalFileManager *)sharedInstance{
     
@@ -37,12 +35,10 @@ static SZYLocalFileManager *manager = nil;
         NSParameterAssert(nil);
     }
     return manager;
-    
 }
 
 - (instancetype)init
 {
-    
     NSString *str = (NSString *)manager;
     if ([str isKindOfClass:[NSString class]] || [str isEqualToString:@"SZYLocalFileManager"]) {
         self = [super init];
@@ -70,73 +66,53 @@ static SZYLocalFileManager *manager = nil;
 
 //创建各级目录
 -(NSString *)setUpLocalFileDir:(SZYSecondFolderType)type{
-        
-    NSString *userFolderPath = [_documentsDir stringByAppendingPathComponent:[ApplicationDelegate.userSession phone_number]];
     
-    NSString *resultPath = nil;
-    
+    //一级目录：用户手机号
+    NSString *userFirFolderPath = [_documentsDir stringByAppendingPathComponent:[ApplicationDelegate.userSession phone_number]];
+    //二级目录
+    NSString *userSecFolderPath = nil;
     switch (type) {
             
-        case kUserFolderType:
+        case kUserFolderType://用户文件夹
         {
-            [self creatDir:userFolderPath];
-            resultPath = userFolderPath;
+            userSecFolderPath = userFirFolderPath;
+        }
+            break;
+        case kNoteImageFolderType://笔记图片文件夹
+        {
+            userSecFolderPath = [userFirFolderPath stringByAppendingPathComponent:kNoteImageDir];
+        }
+            break;
+        case kNoteContentFolderType://笔记正文文件夹
+        {
+            userSecFolderPath = [userFirFolderPath stringByAppendingPathComponent:kNoteContentDir];
+        }
+            break;
+        case kNoteVideoFolderType://笔记录音文件夹
+        {
+            userSecFolderPath = [userFirFolderPath stringByAppendingPathComponent:kNoteVideoDir];
+        }
+            break;
+        case kUserImageFolderType://用户图片文件夹
+        {
+            userSecFolderPath = [userFirFolderPath stringByAppendingPathComponent:kUserImageDir];
+        }
+            break;
+        case kUserIntervalFolderType://用户心情文件夹
+        {
+            userSecFolderPath = [userFirFolderPath stringByAppendingPathComponent:kUserIntervalDir];
         }
             break;
             
-        case kNoteImageFolderType:
-        {
-            
-            NSString *noteImagePath = [userFolderPath stringByAppendingPathComponent:kNoteImageDir];
-            [self creatDir:noteImagePath];
-            resultPath = noteImagePath;
-            
-        }
-            break;
-            
-        case kNoteContentFolderType:
-        {
-            
-            NSString *noteContentPath = [userFolderPath stringByAppendingPathComponent:kNoteContentDir];
-            [self creatDir:noteContentPath];
-            resultPath = noteContentPath;
-            
-        }
-            break;
-        case kNoteVideoFolderType:
-        {
-            NSString *noteVideoPath = [userFolderPath stringByAppendingPathComponent:kNoteVideoDir];
-            [self creatDir:noteVideoPath];
-            resultPath = noteVideoPath;
-            
-        }
-            break;
-        case kUserImageFolderType:
-        {
-            NSString *userAvaterPath = [userFolderPath stringByAppendingPathComponent:kUserImageDir];
-            [self creatDir:userAvaterPath];
-            resultPath = userAvaterPath;
-            
-        }
-            break;
-        case kUserIntervalFolderType:
-        {
-            
-            NSString *userIntervalPath = [userFolderPath stringByAppendingPathComponent:kUserIntervalDir];
-            [self creatDir:userIntervalPath];
-            resultPath = userIntervalPath;
-        }
-            break;
-
         default:
             break;
     }
     
-    
-    return resultPath;
+    [self creatDir:userSecFolderPath];
+    return userSecFolderPath;
 }
 
-//创建目录
+//创建指定目录
 -(void)creatDir:(NSString *)dir{
     
     if (![self.manager fileExistsAtPath:dir]) {
@@ -145,57 +121,33 @@ static SZYLocalFileManager *manager = nil;
     }
 }
 
-
-#pragma mark - 笔记业务
-
-//保存笔记的图片到本地
--(NSString *)saveNoteImage:(UIImage *)image NoteID:(NSString *)noteID IsFake:(BOOL)isFake{
+//存储文件到本地
+-(void)saveFile:(id)file fileName:(NSString *)fileName withType:(SZYSecondFolderType)type successHandler:(successHandler)success failureHandler:(failureHandler)failure{
     
-    //图片转成NSData格式
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.5f);
-    //文件名称
-    NSString *imageFileName = [NSString stringWithFormat:@"%@-%@.jpg",noteID,kNoteImageFileSuffix];
-    
-    NSString* fullPathToFile = [[self setUpLocalFileDir:kNoteImageFolderType] stringByAppendingPathComponent:imageFileName];
-    
-    if (!isFake) {
-        
-        if ([self.manager fileExistsAtPath:fullPathToFile]) {
-            //如果存在同名文件，首先删除
-            NSError *error;
-            [self.manager removeItemAtPath:fullPathToFile error:&error];
-        }
-        //写入图片文件
-        [imageData writeToFile:fullPathToFile atomically:NO];
+    NSString* fullPathToFile = [[self setUpLocalFileDir:type] stringByAppendingPathComponent:fileName];
+    NSError *error = nil;
+    NSData *fileData = nil;
+    //图片
+    if ([file isKindOfClass:[UIImage class]]) fileData = UIImageJPEGRepresentation((UIImage *)file, 0.5f);
+    //文字
+    if ([file isKindOfClass:[NSString class]]) fileData = [(NSString *)file dataUsingEncoding:NSUTF8StringEncoding];
+    //如果存在同名文件，首先删除
+    if ([self.manager fileExistsAtPath:fullPathToFile]) [self.manager removeItemAtPath:fullPathToFile error:&error];
+    //写入图片文件
+    if ([self.manager createFileAtPath:fullPathToFile contents:fileData attributes:nil]) {
+        success(fullPathToFile);
+    }else{
+        failure(error);
     }
-
-    return fullPathToFile;
 }
 
-//保存笔记正文到本地
--(NSString *)saveNoteContent:(NSString *)content NoteID:(NSString *)noteID isFake:(BOOL)isFake{
-   
-    NSString *textFileName = [NSString stringWithFormat:@"%@-%@.txt",noteID,kNoteContentFileSuffix];
+-(void)deleteFileWithPath:(NSString *)filePath completionHandler:(completedHandler)handler{
     
-    NSString* fullPathToFile = [[self setUpLocalFileDir:kNoteContentFolderType] stringByAppendingPathComponent:textFileName];
-    
-    if (!isFake) {
-        if ([self.manager fileExistsAtPath:fullPathToFile]) {
-            NSError *error;
-            [self.manager removeItemAtPath:fullPathToFile error:&error];
-        }
-        [self.manager createFileAtPath:fullPathToFile contents:[content dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+    if ([self.manager fileExistsAtPath:filePath]) {
+        NSError *error;
+        [self.manager removeItemAtPath:filePath error:&error];
+        handler(error);
     }
-
-    return fullPathToFile;
-}
-
-//返回笔记录音可用地址
--(NSString *)noteVideoPathWithNoteID:(NSString *)noteID{
-    
-    NSString *videoFileName = [NSString stringWithFormat:@"%@-%@.caf",noteID,kNoteVideoFileSuffix];
-    NSString* fullPathToFile = [[self setUpLocalFileDir:kNoteVideoFolderType] stringByAppendingPathComponent:videoFileName];
-    return fullPathToFile;
 }
 
 -(NSString *)contentFileAtPath:(NSString *)path{
@@ -207,101 +159,66 @@ static SZYLocalFileManager *manager = nil;
 
 -(UIImage *)imageFileAtPath:(NSString *)path{
     
-    return  [UIImage imageWithContentsOfFile:path];
+    UIImage *image = [UIImage imageWithContentsOfFile:path];
+    return image;
 }
 
-
-#pragma mark - 用户信息业务
-
-
--(NSString *)saveUserAvater:(UIImage *)image UserID:(NSString *)userID isFake:(BOOL)isFake{
-    
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.5f);
-    NSString *imageName = [NSString stringWithFormat:@"%@-%@.jpg",userID,kUserAvaterSuffix];
-    
-    NSString* fullPathToFile = [[self setUpLocalFileDir:kUserImageFolderType] stringByAppendingPathComponent:imageName];
-    
-    if (!isFake) {
-        if ([self.manager fileExistsAtPath:fullPathToFile]) {
-            //如果存在同名文件，首先删除
-            NSError *error;
-            [self.manager removeItemAtPath:fullPathToFile error:&error];
-        }
-        [imageData writeToFile:fullPathToFile atomically:NO];
-    }
-    return fullPathToFile;
-}
-
--(NSString *)saveUserImage:(UIImage *)image UserID:(NSString *)userID isFake:(BOOL)isFake{
-    
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.5f);
-    //加时间戳
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"yyyyMMddHHmmss";
-    NSString *timeStr = [formatter stringFromDate:[NSDate date]];
-    
-    NSString *imageName = [NSString stringWithFormat:@"%@%@-%@.jpg",timeStr,userID,kUserImageSuffix];
-    
-    NSString* fullPathToFile = [[self setUpLocalFileDir:kUserImageFolderType] stringByAppendingPathComponent:imageName];
-    
-    if (!isFake) {
-        if ([self.manager fileExistsAtPath:fullPathToFile]) {
-            //如果存在同名文件，首先删除
-            NSError *error;
-            [self.manager removeItemAtPath:fullPathToFile error:&error];
-        }
-        [imageData writeToFile:fullPathToFile atomically:NO];
-    }
-    return fullPathToFile;
-    
-}
-
-#pragma mark - 其他业务
-
-//获取temp文件夹下,所有文件的大小
 -(float)fileSizeAtTempFolder{
     
-    NSString *tempDirectory = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
     float folderSize;
-    if ([fileManager fileExistsAtPath:tempDirectory]) {
+    if ([self.manager fileExistsAtPath:self.cacheDir]) {
         //拿到含有文件的数组
-        NSArray *childerFiles = [fileManager subpathsAtPath:tempDirectory];
+        NSArray *childerFiles = [self.manager subpathsAtPath:self.cacheDir];
         //拿到每个文件的名字,如有有不想清除的文件就在这里判断
         for (NSString *fileName in childerFiles) {
             //将路径拼接到一起
-            NSString *fullPath = [tempDirectory stringByAppendingPathComponent:fileName];
+            NSString *fullPath = [self.cacheDir stringByAppendingPathComponent:fileName];
             folderSize += [self fileSizeAtPath:fullPath];
         }
     }
     return folderSize;
 }
 
-//计算单个文件夹的大小
 -(float)fileSizeAtPath:(NSString *)path{
     
-    NSFileManager *fileManager=[NSFileManager defaultManager];
-    if([fileManager fileExistsAtPath:path]){
-        long long size=[fileManager attributesOfItemAtPath:path error:nil].fileSize;
+    if([self.manager fileExistsAtPath:path]){
+        long long size = [self.manager attributesOfItemAtPath:path error:nil].fileSize;
         return size/1024.0/1024.0;
     }
     return 0;
 }
 
-//清除temp文件夹下的缓存
--(void)cleanTempFolder{
+-(void)cleanTempFolderHandler:(completedHandler)block{
     
-    NSString *path = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSFileManager *fileManager=[NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:path]) {
-        NSArray *childerFiles=[fileManager subpathsAtPath:path];
+    NSError *error = nil;
+    BOOL isDir;
+    if ([self.manager fileExistsAtPath:self.cacheDir isDirectory:&isDir]) {
+        //path下的所有子文件夹
+        NSArray *childerFiles = [self.manager contentsOfDirectoryAtPath:self.cacheDir error:&error];
         for (NSString *fileName in childerFiles) {
             //如有需要，加入条件，过滤掉不想删除的文件
-            NSString *absolutePath=[path stringByAppendingPathComponent:fileName];
-            [fileManager removeItemAtPath:absolutePath error:nil];
+            NSString *absolutePath = [self.cacheDir stringByAppendingPathComponent:fileName];
+            [self.manager removeItemAtPath:absolutePath error:&error];
         }
+        block(error);
     }
-    
 }
+
+-(NSString *)createDataBaseLocalFileDir{
+
+    //获取项目info文件
+    NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+    //获取项目Bundle Name
+    NSString *key = (NSString *)kCFBundleNameKey;
+    NSString *bundleName = infoDict[key];
+    //拼接数据库名
+    NSString *dbName = [NSString stringWithFormat:@"%@%@",bundleName,@".sqlite3"];
+
+    NSString *documentationPath = [NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *dbPath = [documentationPath stringByAppendingPathComponent:dbName];
+    [self creatDir:documentationPath];
+    return dbPath;
+}
+
 
 @end

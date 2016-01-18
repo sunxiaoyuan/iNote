@@ -12,6 +12,10 @@
 
 @interface SZYOpenListCellCell ()
 
+@property (strong, nonatomic) IBOutlet UILabel *nameLabel;
+@property (strong, nonatomic) IBOutlet UILabel *numberLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *arrowImageView;
+
 @end
 
 @implementation SZYOpenListCellCell
@@ -25,6 +29,13 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+-(void)setNoteBookModel:(SZYNoteBookModel *)noteBook{
+    
+    self.nameLabel.text = noteBook.title;
+    self.numberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[noteBook.noteList count]];
+    
 }
 
 

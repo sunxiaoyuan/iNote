@@ -7,28 +7,21 @@
 //
 
 #import "SZYSolidaterFactory.h"
-#import "SZYNoteSolidater.h"
-#import "SZYNoteBookSolidater.h"
+#import "SZYNoteModel.h"
+#import "SZYNoteBookModel.h"
 
 @implementation SZYSolidaterFactory
 
-+(id)solidaterFctoryWithType:(SZYLocalManagerType)type{
++(id)solidaterFctoryWithType:(NSString *)type{
     
-    switch (type) {
-            
-        case kNoteType:
-        {
-            SZYNoteSolidater *solidater = [[SZYNoteSolidater alloc]init];
-            return solidater;
-        }
-            break;
-        case kNoteBookType:
-        {
-            SZYNoteBookSolidater *solidater = [[SZYNoteBookSolidater alloc]init];
-            return solidater;
-        }
-            break;
+    id solidater = nil;
+    if ([type isEqualToString:NSStringFromClass([SZYNoteModel class])]){
+        solidater = [[SZYNoteSolidater alloc]init];
     }
+    if ([type isEqualToString:NSStringFromClass([SZYNoteBookModel class])]) {
+        solidater = [[SZYNoteBookSolidater alloc]init];
+    }
+    return solidater;
 }
 
 @end

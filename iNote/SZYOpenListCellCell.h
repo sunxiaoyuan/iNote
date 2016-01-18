@@ -7,12 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class SZYNoteBookModel;
 
 @interface SZYOpenListCellCell : UITableViewCell
 
-@property (strong, nonatomic) IBOutlet UILabel *nameLabel;
-@property (strong, nonatomic) IBOutlet UILabel *numberLabel;
-@property (strong, nonatomic) IBOutlet UIImageView *arrowImageView;
+-(void)setNoteBookModel:(SZYNoteBookModel *)noteBook;
 
 @end

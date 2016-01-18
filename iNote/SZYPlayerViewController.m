@@ -7,17 +7,41 @@
 //
 
 #import "SZYPlayerViewController.h"
-#import <AVFoundation/AVFoundation.h>
+#import "SZYSoundManager.h"
 
 @interface SZYPlayerViewController ()<AVAudioPlayerDelegate>
 
-- (IBAction)startAction:(id)sender;
-- (IBAction)stopAction:(id)sender;
+@property (strong, nonatomic) IBOutlet UIView *topView;
+@property (strong, nonatomic) IBOutlet UIView *bottomView;
+@property (strong, nonatomic) IBOutlet UILabel *elapsedTimeLabel;
+@property (strong, nonatomic) IBOutlet UIButton *backBtn;
+@property (strong, nonatomic) IBOutlet UILabel *remainTimeLabel;
+@property (strong, nonatomic) IBOutlet UISlider *slider;
+@property (strong, nonatomic) IBOutlet UIButton *resumeBtn;
+@property (strong, nonatomic) IBOutlet UIButton *playBtn;
+@property (strong, nonatomic) IBOutlet UIButton *resumeOrPauseBtn;
+- (IBAction)playAction:(UIButton *)sender;
+- (IBAction)backOrForwardAudio:(id)sender;
 - (IBAction)backAction:(id)sender;
+- (IBAction)resumeOrPauseAction:(UIButton *)sender;
+@property (nonatomic, strong) NSString       *audioPath;
+@property (nonatomic, strong) SZYSoundManager *soundManager;
 
-@property (weak, nonatomic ) IBOutlet UIProgressView *playProgress;
-@property (weak ,nonatomic ) NSTimer        *timer;//进度更新定时器
-@property (nonatomic,strong) AVAudioPlayer  *audioPlayer;//播放器
+//约束部分
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *topViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bottomViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *backBtnWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *backBtnHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *backBtnTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *backBtnLeftConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *resumeBtnHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *resumeBtnWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *resumeBtnBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *playBtnWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *playBtnHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *playBtnLeftConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *elapsedLblWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *elapsedLblHeightConstraint;
 
 @end
 
@@ -26,76 +50,99 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    [session setCategory:AVAudioSessionCategoryPlayback error:nil];
-    [session setActive:YES error:nil];
+    //文字适配
+    self.backBtn.titleLabel.font = FONT_18;
+    //色彩适配
+    self.topView.backgroundColor = UIColorFromRGB(0x57bffc);
+    self.bottomView.backgroundColor = UIColorFromRGB(0x00a2ff);
+
+    self.soundManager = [SZYSoundManager sharedManager];
+    //设置音频会话
+    [SZYSoundManager setAudioSession];
+
 }
 
-#pragma mark - 播放器代理方法
-
--(void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag{
-    //播放完成，自动跳回
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     
+    CGFloat viewW = self.view.width;
+    CGFloat viewH = self.view.height;
+    
+    self.topViewHeightConstraint.constant = 0.618 * viewH;
+    self.bottomViewHeightConstraint.constant = 0.382 * viewH;
+    
+    self.backBtnTopConstraint.constant = 0.05 * viewH;
+    self.backBtnLeftConstraint.constant = 0.05 * viewW;
+    self.backBtnWidthConstraint.constant = 0.14 * viewW;
+    self.backBtnHeightConstraint.constant = 0.05 * viewH;
+    
+    self.resumeBtnWidthConstraint.constant = 0.2 * viewH;
+    self.resumeBtnHeightConstraint.constant = self.resumeBtnWidthConstraint.constant;
+    self.resumeBtnBottomConstraint.constant = 0.07 * viewH;
+    
+    self.playBtnWidthConstraint.constant = 0.09 * viewW;
+    self.playBtnHeightConstraint.constant = self.playBtnWidthConstraint.constant;
+    self.playBtnLeftConstraint.constant = 0.13 * viewW;
+    
+    self.elapsedLblWidthConstraint.constant = 0.12 * viewW;
+    self.elapsedLblHeightConstraint.constant = 0.03 * viewH;
+    
+    [self.view setNeedsLayout];
+}
+
+-(void)setLocalAudioFilePath:(NSString *)audioPath{
+    
+    _audioPath = audioPath;
+//    _audioPath = [NSString stringWithFormat:@"%@/%@", [[NSBundle mainBundle]resourcePath], @"jazz.mp3"];  //测试数据
 }
 
 #pragma mark - 响应方法
 
-//播放
-- (IBAction)startAction:(id)sender {
+//开始播放
+- (IBAction)playAction:(UIButton *)sender {
     
-    if (![self.audioPlayer isPlaying]) {
-        [self.audioPlayer play];
-        self.timer.fireDate = [NSDate distantPast];//恢复定时器
-    }
+    [self.soundManager startPlayingLocalFileWithPath:self.audioPath andBlock:^(int percentage, CGFloat elapsedTime, CGFloat timeRemaining, NSError *error, BOOL finished) {
+        
+        NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
+        formatter.dateFormat = @"mm:ss";
+        NSDate *elapsedTimeDate = [NSDate dateWithTimeIntervalSince1970:elapsedTime];
+        _elapsedTimeLabel.text = [formatter stringFromDate:elapsedTimeDate];
+        NSDate *timeRemainingDate = [NSDate dateWithTimeIntervalSince1970:timeRemaining];;
+        _remainTimeLabel.text = [formatter stringFromDate:timeRemainingDate];
+        _slider.value = percentage * 0.01;
+        //主按钮这样处理，是避免计时器循环过程中不断刷新按钮状态
+//        if (finished) {
+            self.resumeOrPauseBtn.selected = !finished;
+//        }
+    }];
+    //设置主按钮样
+//    self.resumeOrPauseBtn.selected = YES;
 }
 
-//暂停
-- (IBAction)stopAction:(id)sender {
+//调节播放进度
+- (IBAction)backOrForwardAudio:(id)sender {
     
-    if ([self.audioPlayer isPlaying]) {
-        [self.audioPlayer pause];
-        self.timer.fireDate = [NSDate distantFuture];
-        //暂停定时器，注意不能调用invalidate方法，此方法会取消，之后无法恢复
-    }
+    UISlider *slider = (UISlider *)sender;
+    [self.soundManager moveToSection:slider.value];
 }
+
 
 - (IBAction)backAction:(id)sender {
-    
+    //关闭播放器
+    [self.soundManager stop];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-//更新播放进度
--(void)updateProgress{
-    float progress = self.audioPlayer.currentTime /self.audioPlayer.duration;
-    [self.playProgress setProgress:progress animated:true];
-}
-
-#pragma mark - getters
-
--(NSTimer *)timer{
-    if (!_timer) {
-        _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updateProgress) userInfo:nil repeats:true];
+- (IBAction)resumeOrPauseAction:(UIButton *)sender {
+    
+    if (sender.selected) {
+        //pause
+        [self.soundManager pause];
+    }else{
+        //resume
+        [self.soundManager resume];
     }
-    return _timer;
-}
-
--(AVAudioPlayer *)audioPlayer{
-    if (!_audioPlayer){
-        NSURL *url = [NSURL fileURLWithPath:self.videoPath];
-        NSError *error = nil;
-        //初始化播放器，注意这里的Url参数只能时文件路径，不支持HTTP Url
-        _audioPlayer = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
-        //设置播放器属性
-        _audioPlayer.numberOfLoops = 0;//设置为0不循环
-        _audioPlayer.volume = 1.0;
-        _audioPlayer.delegate = self;
-        [_audioPlayer prepareToPlay];//加载音频文件到缓存
-        if(error){
-            NSLog(@"初始化播放器过程发生错误,错误信息:%@",error.localizedDescription);
-            return nil;
-        }
-    }
-    return _audioPlayer;
+    sender.selected = !sender.selected;
 }
 
 

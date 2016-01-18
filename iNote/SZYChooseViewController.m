@@ -10,28 +10,25 @@
 #import "SZYDetailNaviView.h"
 #import "SZYNoteModel.h"
 #import "SZYNoteBookModel.h"
-#import "SZYOpenListCellCell.h"
 #import "SZYchooseCell.h"
-#import "SZYNoteBookList.h"
-#import "NSObject+Memento.h"
+#import "SZYNoteSolidater.h"
 
-@interface SZYChooseViewController ()<SZYDetailNaviViewDelegate,UITableViewDelegate,UITableViewDataSource>
+@interface SZYChooseViewController ()<SZYCustomNaviViewDelegate,UITableViewDelegate,UITableViewDataSource>
 
 //导航栏
 @property (nonatomic, strong) SZYDetailNaviView *naviView;
 @property (nonatomic, strong) UITableView       *tableView;
 @property (nonatomic, strong) NSMutableArray    *allNoteBookArr;//笔记本的列表
-@property (nonatomic, assign) NSInteger         chosenRow;
+@property (nonatomic, strong) SZYNoteModel      *currentNote;
 @end
 
 @implementation SZYChooseViewController
 
-- (instancetype)initWithSelectedRow:(NSInteger)row
+- (instancetype)initWithCurrentNote:(SZYNoteModel *)note
 {
     self = [super init];
     if (self) {
-        //拿到选中的笔记本索引
-        self.chosenRow = row;
+        _currentNote = note;
     }
     return self;
 }
@@ -41,16 +38,11 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    //读取笔记本列表的快照
-    SZYNoteBookList *noteBookList = [[SZYNoteBookList alloc]init];
-    [noteBookList recoverFromStateWithKey:kNoteBookListSnapShot];
-    self.allNoteBookArr = [noteBookList.noteBookList mutableCopy];
-    
+    //加载笔记本列表简介－不加载笔记本下的所有笔记信息
+    [self loadNoteBookList];
     
     [self.view addSubview:self.naviView];
     [self.view addSubview:self.tableView];
-    [self clearExtraLine:self.tableView];
-    
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -60,13 +52,6 @@
     self.naviView.frame = CGRectMake(0, 0, UIScreenWidth, NavigationBarHeight);
     //表格
     self.tableView.frame = CGRectMake(0, NavigationBarHeight, UIScreenWidth, UIScreenHeight-64);
-}
-
-//去掉下方多余的线
--(void)clearExtraLine:(UITableView *)tableView{
-    UIView *view = [[UIView alloc]init];
-    view.backgroundColor = [UIColor clearColor];
-    [self.tableView setTableFooterView:view];
 }
 
 #pragma mark - TableViewDelegate和TableViewDataSource
@@ -92,8 +77,7 @@
     }
     SZYNoteBookModel *noteBook = self.allNoteBookArr[indexPath.row];
     cell.titleLabel.text = noteBook.title;
-    //只显示选中行的图片
-    if (indexPath.row == self.chosenRow) {
+    if ([noteBook.noteBook_id isEqualToString:self.currentNote.noteBook_id_belonged]) {
         cell.indicatorImageView.hidden = NO;
     }
     return cell;
@@ -102,7 +86,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
 
     //传值：notebook对象
-    [self.delegate didChooseNoteBook:self.allNoteBookArr[indexPath.row] AtRow:indexPath.row];
+    [self.delegate didChooseNoteBook:self.allNoteBookArr[indexPath.row]];
     //调转到笔记列表页
     [self.navigationController popViewControllerAnimated:YES];
     
@@ -114,14 +98,27 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark - 私有方法
+
+-(void)loadNoteBookList{
+    
+    SZYNoteBookSolidater *noteBookSolidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
+    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+        [noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
+            self.allNoteBookArr = (NSMutableArray *)result;
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"%@",errorMsg);
+        }];
+    }];
+}
+
 #pragma mark - getters
 
 -(SZYDetailNaviView *)naviView{
     if (_naviView == nil){
         _naviView = [[SZYDetailNaviView alloc]init];
         _naviView.delegate = self;
-        _naviView.doneBtn.hidden = YES;
-        _naviView.moreBtn.hidden = YES;
+        [_naviView hideBarButton];
     }
     return _naviView;
 }
@@ -132,6 +129,7 @@
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.backgroundColor = [UIColor whiteColor];
+        [_tableView setTableFooterView:[[UIView alloc]init]];
     }
     return _tableView;
 }

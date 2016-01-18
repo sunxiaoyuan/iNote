@@ -8,40 +8,48 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum : NSUInteger {
-    
+
+typedef void (^completedHandler) (NSError *error);
+typedef void (^successHandler)   (NSString *filePath);
+typedef void (^failureHandler)   (NSError  *error);
+
+
+typedef NS_ENUM (NSInteger, SZYSecondFolderType) {
     kUserFolderType,
-    kNoteImageFolderType ,
+    kNoteImageFolderType, //创建笔记信息文件夹
     kNoteContentFolderType,
     kNoteVideoFolderType,
-    kUserImageFolderType,
+    kUserImageFolderType, //创建用户信息文件夹
     kUserIntervalFolderType,
-    
-} SZYSecondFolderType;
+};
 
 @interface SZYLocalFileManager : NSObject
 
+//初始化
 +(SZYLocalFileManager *)sharedInstance;
 
 //创建各级目录
 -(NSString *)setUpLocalFileDir:(SZYSecondFolderType)type;
-//保存笔记的图片到本地
--(NSString *)saveNoteImage:(UIImage *)image NoteID:(NSString *)noteID IsFake:(BOOL)isFake;
-//保存笔记正文到本地
--(NSString *)saveNoteContent:(NSString *)content NoteID:(NSString *)noteID isFake:(BOOL)isFake;
-//读取笔记的内容
--(NSString *)contentFileAtPath:(NSString *)path;
-//读取笔记的图片
--(UIImage *)imageFileAtPath:(NSString *)path;
-//返回录音本地可用地址
--(NSString *)noteVideoPathWithNoteID:(NSString *)noteID;
 
-//保存用户头像
--(NSString *)saveUserAvater:(UIImage *)image UserID:(NSString *)userID isFake:(BOOL)isFake;
-//保存用户图片
--(NSString *)saveUserImage:(UIImage *)image UserID:(NSString *)userID isFake:(BOOL)isFake;
+//保存文件到本地
+-(void)saveFile:(id)file fileName:(NSString *)fileName withType:(SZYSecondFolderType)type successHandler:(successHandler)success failureHandler:(failureHandler)failure;
 
+//获取缓存文件夹大小
 -(float)fileSizeAtTempFolder;
--(void)cleanTempFolder;
+
+//清理缓存文件夹
+-(void)cleanTempFolderHandler:(completedHandler)block;
+
+//读取文本文件
+-(NSString *)contentFileAtPath:(NSString *)path;
+
+//读取图片文件
+-(UIImage *)imageFileAtPath:(NSString *)path;
+
+//删除本地文件
+-(void)deleteFileWithPath:(NSString *)filePath completionHandler:(completedHandler)handler;
+
+//创建数据库文件目录
+-(NSString *)createDataBaseLocalFileDir;
 
 @end

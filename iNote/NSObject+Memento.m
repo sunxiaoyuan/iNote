@@ -27,7 +27,6 @@
     id state = [SZYMemento fetchObjectFromMementoWithKey:key];
     id <SZYMementoProtocol> obj = (id <SZYMementoProtocol>)self;
     [obj recoverFromState:state];
-
 }
 
 @end
