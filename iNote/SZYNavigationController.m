@@ -41,7 +41,6 @@
     //标题样式
     [bar setTitleTextAttributes:@{NSFontAttributeName:FONT_20,
                                   NSForegroundColorAttributeName:[UIColor whiteColor]}];
-    
 }
 
 #pragma mark - 手势代理方法

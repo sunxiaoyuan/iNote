@@ -11,11 +11,18 @@
 #import "SZYNoteBookModel.h"
 #import "SZYNoteBookCell.h"
 #import "SZYNoteBookViewController.h"
+<<<<<<< HEAD
 #import "MJRefresh.h"
 #import "SZYRefreshHeader.h"
+=======
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 
+
+<<<<<<< HEAD
+=======
 @interface SZYNotesViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 @property (nonatomic, strong) UITableView          *tableView;//表视图
 @property (nonatomic, strong) NSMutableArray       *noteBookArr;
 @property (nonatomic, strong) NSIndexPath          *selectIndexPath;
@@ -31,6 +38,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+<<<<<<< HEAD
     
     //不需要系统自动处理顶部内容伸缩
     self.automaticallyAdjustsScrollViewInsets = NO;
@@ -57,6 +65,32 @@
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
 
+=======
+    //不需要系统自动处理顶部内容伸缩
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    //设置底色
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    //加载组件
+    [self.view addSubview:self.addNoteBookBtn];
+    [self.view addSubview:self.sepLineView];
+    [self.view addSubview:self.tableView];
+    //自定义右上角按钮
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
+    //初始化数据库工具
+    self.noteBookSolidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    [self loadData];
+    
+    self.addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
+    self.sepLineView.frame = CGRectMake(0, 44, UIScreenWidth, 1);
+    self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
+}
+
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 #pragma mark - TableViewDelegate和TableViewDataSource
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -68,7 +102,11 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+<<<<<<< HEAD
     return 120;
+=======
+    return 100;
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -77,11 +115,16 @@
     if (cell == nil) {
         cell = [[SZYNoteBookCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+<<<<<<< HEAD
 
     }
     SZYNoteBookModel *noteBook = _noteBookArr[indexPath.row];
     cell.titleLabel.text = noteBook.title;
     cell.subTitleLabel.text = [NSString stringWithFormat:@"(%lu个笔记)",(unsigned long)[noteBook.noteList count]];
+=======
+    }
+    cell.noteBook = _noteBookArr[indexPath.row];
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     return cell;
 }
 
@@ -94,7 +137,6 @@
     [self.navigationController pushViewController:noteBookVC animated:YES];
     
 }
-
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -141,11 +183,15 @@
     }else{ //新建笔记本的alert
         if (buttonIndex == 1) {
             UITextField *tf = [alertView textFieldAtIndex:0];
+<<<<<<< HEAD
             SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]init];
             newNoteBook.noteBook_id = [NSString stringOfUUID];
             newNoteBook.user_id_belonged = ApplicationDelegate.userSession.user_id;
             newNoteBook.title = tf.text;
             newNoteBook.isPrivate = @"NO";
+=======
+            SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]initWithID:[NSString stringOfUUID] Title:tf.text UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
             [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
                 //插入一行笔记本数据
                 [_noteBookSolidater saveOne:newNoteBook successHandler:^(id result) {
@@ -161,6 +207,7 @@
 
 #pragma mark - 私有方法
 
+<<<<<<< HEAD
 -(void)setHeadRefresh{
     SZYRefreshHeader *header = [SZYRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
     // 隐藏时间
@@ -173,6 +220,8 @@
     self.tableView.header = header;
 }
 
+=======
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 -(void)editBtnClick:(UIButton *)sender{
     
     if (_tableView.isEditing) {
@@ -205,6 +254,7 @@
         self.noteBookArr = [NSMutableArray array];
     }
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+<<<<<<< HEAD
         [_noteBookSolidater readAllSuccessHandler:^(id result) {
             self.noteBookArr = (NSMutableArray *)result;
             //停止刷新
@@ -212,6 +262,13 @@
         } failureHandler:^(NSString *errorMsg) {
             NSLog(@"error = %@",errorMsg);
 
+=======
+        //获取笔记本简介列表
+        [_noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
+            self.noteBookArr = (NSMutableArray *)result;
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"error = %@",errorMsg);
+>>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
         }];
     }];
     [self.tableView reloadData];
