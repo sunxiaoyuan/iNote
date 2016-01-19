@@ -10,14 +10,19 @@
 @class SZYNoteModel;
 
 typedef NS_ENUM(NSInteger, SZYFromType) {
-    SZYFromListType,
-    SZYFromAddType,
+    SZYFromListType,//将要做修改操作
+    SZYFromAddType,//将要做创建操作
 };
 
 @interface SZYDetailViewController : UIViewController
 
-//>>>>>>>>>>>>>>接受数据模型的初始化方法<<<<<<<<<<<<<<<<//
-
+/**
+ *  初始化方法
+ *
+ *  @param noteBook 详情页展示的笔记
+ *  @param type     跳转来源
+ *
+ */
 -(instancetype)initWithNote:(SZYNoteModel *)noteBook AndSourceType:(SZYFromType)type;
 
 @end

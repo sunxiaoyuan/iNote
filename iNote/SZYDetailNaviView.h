@@ -7,22 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SZYCustomNaviViewDelegate.h"
 
-@protocol SZYDetailNaviViewDelegate <NSObject>
-
-@required
--(void)backBtnDidClick;
-
-@optional
--(void)moreBtnDidclick;
--(void)doneBtnDidClick;
-
-@end
 
 @interface SZYDetailNaviView : UIView
 
-@property (nonatomic, strong) UIButton          *doneBtn;
-@property (nonatomic, strong) UIButton          *moreBtn;
-@property (nonatomic, assign) id<SZYDetailNaviViewDelegate> delegate;
+@property (nonatomic, assign) id<SZYCustomNaviViewDelegate> delegate;
+
+-(void)enterEditingState;
+
+-(void)exitEditingState;
+
+-(void)hideBarButton;
+
+-(void)removeMoreBtn;
 
 @end

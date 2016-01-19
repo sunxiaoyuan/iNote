@@ -15,12 +15,12 @@
  *
  ****************************************************************/
 //笔记
-#define CREATE_NOTE_TABLE (@"CREATE TABLE NOTE_DATA_TABLE(note_id TEXT,noteBook_id_belonged TEXT,user_id_belonged TEXT,title TEXT,mendTime TEXT,content TEXT,image TEXT,video TEXT,isFavorite TEXT)")
+#define CREATE_NOTE_TABLE (@"CREATE TABLE IF NOT EXISTS NOTE_DATA_TABLE(note_id TEXT,noteBook_id_belonged TEXT,user_id_belonged TEXT,title TEXT,mendTime TEXT,content TEXT,image TEXT,video TEXT,isFavorite TEXT)")
 #define DELETE_ALL_NOTES (@"DELETE FROM NOTE_DATA_TABLE")
 #define DELETE_ONE_NOTE (@"DELETE FROM NOTE_DATA_TABLE WHERE note_id = ?")
 
 //笔记本
-#define CREATE_NOTE_BOOK_TABLE (@"CREATE TABLE NOTE_BOOK_DATA_TABLE(noteBook_id TEXT,user_id_belonged TEXT,title TEXT,noteNumber TEXT,isPrivate TEXT)")
+#define CREATE_NOTE_BOOK_TABLE (@"CREATE TABLE IF NOT EXISTS NOTE_BOOK_DATA_TABLE(noteBook_id TEXT,user_id_belonged TEXT,title TEXT,noteNumber TEXT,isPrivate TEXT)")
 
 #define DELETE_ALL_NOTE_BOOKS (@"DELETE FROM NOTE_BOOK_DATA_TABLE")
 
@@ -36,7 +36,6 @@
 
 //笔记本
 #define INSERT_ONE_NOTE_BOOK (@"INSERT INTO NOTE_BOOK_DATA_TABLE(noteBook_id,user_id_belonged,title,noteNumber,isPrivate) VALUES(?,?,?,?,?)")
-
 
 /**************************************************
  *

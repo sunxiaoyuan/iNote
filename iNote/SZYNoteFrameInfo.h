@@ -7,26 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SZYNoteModel.h"
+#import "SZYCellState.h"
+@class SZYNoteModel;
 
 @interface SZYNoteFrameInfo : NSObject
-
 //单元格高度
-@property (nonatomic, assign) float cellHeight;
-
+@property (nonatomic, assign) CGFloat          cellHeight;
 //控件frame
+@property (nonatomic, assign) CGRect noteImageViewFrame;
+@property (nonatomic, assign) CGRect noteVideoViewFrame;
 @property (nonatomic, assign) CGRect titleLabelFrame;
 @property (nonatomic, assign) CGRect timeLabelFrame;
 @property (nonatomic, assign) CGRect contentLabelFrame;
-@property (nonatomic, assign) CGRect myImageViewFrame;
-@property (nonatomic, assign) CGRect videoViewFrame;
-@property (nonatomic, assign) CGRect videoIconFrame;
-@property (nonatomic, assign) CGRect arrowIconFrame;
-@property (nonatomic, assign) CGRect fileNameFrame;
-@property (nonatomic, assign) CGRect fileSizeFrame;
+@property (nonatomic, assign) CGRect allInfoBtnFrame;
 
 
-
--(id)initWithNote:(SZYNoteModel *)note;
+-(instancetype)initWithNote:(SZYNoteModel *)note Type:(SZYCellStateType)type;
 
 @end

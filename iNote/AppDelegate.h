@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+@class FMDatabaseQueue;
 @class SZYUser;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
-
-@property (nonatomic, strong) SZYUser *userSession;
-
-@property (nonatomic,assign) BOOL     isLoggedin;
-
+@property (strong, nonatomic) UIWindow        *window;
+@property (nonatomic, strong) SZYUser         *userSession;
+@property (nonatomic, assign) BOOL            isLoggedin;
+@property (nonatomic ,strong) NSString        *dbasePath;
+@property (nonatomic, strong) FMDatabaseQueue *dbQueue;
 
 @end
 

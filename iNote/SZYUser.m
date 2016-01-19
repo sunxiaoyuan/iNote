@@ -8,10 +8,9 @@
 
 #import "SZYUser.h"
 #import "SZYLocalFileManager.h"
-
+#import "NSDate+TimeStamp.h"
 
 @implementation SZYUser
-
 
 - (instancetype)initWithPhoneNumber:(NSString *)phoneNumber AndUserID:(NSString *)user_id
 {
@@ -26,25 +25,33 @@
 
 -(void)cleanLocalSaveData{
     
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"user_session"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:UDUserSession];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
--(void)saveAvater:(UIImage *)img IsFake:(BOOL)isFake{
+-(void)saveAvater:(UIImage *)img {
     
-    NSParameterAssert(img);
     
-    self.head_portrait_url = [[SZYLocalFileManager sharedInstance] saveUserAvater:img UserID:self.user_id isFake:isFake];
-    
+    [[SZYLocalFileManager sharedInstance] saveFile:img fileName:[NSString stringWithFormat:@"%@-%@.jpg",_user_id,kUserAvaterSuffix] withType:kUserImageFolderType successHandler:^(NSString *filePath) {
+        
+        self.head_portrait_url = filePath;
+        
+    } failureHandler:^(NSError *error) {
+        
+        NSLog(@"%@",error);
+        
+    }];
 }
 
--(void)saveImages:(NSMutableArray *)imgArr IsFake:(BOOL)isFake{
-    
-    NSParameterAssert(imgArr);
+-(void)saveImages:(NSMutableArray *)imgArr {
     
     for (UIImage *img in imgArr) {
-        NSString *imgURL = [[SZYLocalFileManager sharedInstance] saveUserImage:img UserID:self.user_id isFake:isFake];
-        [self.image_url_list addObject:imgURL];
+        NSString *imageName = [NSString stringWithFormat:@"%ld%@-%@.jpg",[NSDate currentTimeStampWithLongFormat],_user_id,kUserImageSuffix];
+        [[SZYLocalFileManager sharedInstance] saveFile:img fileName:imageName withType:kUserImageFolderType successHandler:^(NSString *filePath) {
+            [self.image_url_list addObject:filePath];
+        } failureHandler:^(NSError *error) {
+            NSLog(@"%@",error);
+        }];
     }
 }
 

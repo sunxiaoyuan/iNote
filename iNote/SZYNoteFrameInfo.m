@@ -4,112 +4,168 @@
 //
 //  Created by 孙中原 on 15/10/22.
 //  Copyright (c) 2015年 sunzhongyuan. All rights reserved.
-//
+//  VM层，数据视图层－负责视图层跟数据层交互
 
 #import "SZYNoteFrameInfo.h"
+#import "SZYNoteModel.h"
+#import "NSString+SZYKit.h"
 
-//控件左间距
-#define kSZYNoteShowCellSpacing SIZ(13)
-#define kSZYNoteShowCellVerticalSpacing SIZ(3)
-
+//间距
+static CGFloat const kItemLeadingSpacing    = 15;
+static CGFloat const kItemVerticalSpacing   = 10;
+static CGFloat const kItemHorizontalSpacing = 5;
 //图片尺寸
-#define kSZYNoteShowCellImageWidth SIZ(130)
-#define kSZYNoteShowCellImageHeight SIZ(80)
-//录音尺寸
-#define kSZYNoteShowCellVideoWidth SIZ(220)
-#define kSZYNoteShowCellVideoHeight SIZ(40)
-//分割区域高度
-#define kSZYNoteShowCellSeperatorHeight SIZ(5)
-//录音图标尺寸
-#define kSZYNoteShowCellVideoIconWidth SIZ(34)
-#define kSZYNoteShowCellVideoIconHeight SIZ(34)
-//箭头图标尺寸
-#define kSZYNoteShowCellArrowIconWidth  SIZ(24)
-#define kSZYNoteShowCellArrowIconHeight SIZ(24)
-//录音文件信息尺寸
-#define kSZYNoteShowCellFileInfoHeight  SIZ(20)
+static CGFloat const kImageViewWidth        = 18;
+static CGFloat const kImageViewHeight       = 18;
+//标题宽度
+static CGFloat const kTitleLabelWidth       = 140;
+//收起时正文的高度
+static CGFloat const kPartContentHeight     = 40;
+//展开时正文的高度
+static CGFloat const kAllContentHeight      = 120;
 
 
-@implementation SZYNoteFrameInfo
+@interface SZYNoteFrameInfo ()
 
--(id)initWithNote:(SZYNoteModel *)note{
+//根据内容计算高度
+@property (nonatomic, assign) CGFloat          contentHeight;
+//cell状态
+@property (nonatomic, assign) SZYCellStateType type;
+@end
+
+@implementation SZYNoteFrameInfo{
+    CGFloat currentX;
+}
+
+-(instancetype)initWithNote:(SZYNoteModel *)note Type:(SZYCellStateType)type{
     
     self = [super init];
     if (self) {
         if (note == nil) {
             return self;
         }
+        _type = type;
         
-        SZYCommonToolClass *commTools = [[SZYCommonToolClass alloc]init];
+        [self noteImageViewFrameMake:note];
+        [self noteVideoViewFrame:note];
+        [self titleLabelFrameMake:note];
+        [self timeLabelFrameMake:note];
         
-        //标题
-        CGFloat titleX = kSZYNoteShowCellSpacing;
-        CGFloat titleY = kSZYNoteShowCellVerticalSpacing;
-        CGFloat titleW = UIScreenWidth - 2*titleX;
-        NSString *title = [NSString string];
-        //强制给予一个标题
-        ([self checkIfKong:note.title]) ? (title = @"无标题笔记"):(title = note.title);
-        CGSize size = [commTools newLabelSizeWithContent:title Font:FONT_17 IsSngle:YES Width:0];
-        self.titleLabelFrame = CGRectMake(titleX , titleY + SIZ(3), titleW, size.height);
+        [self contentLabelFrameMake:note];
         
-        //时间
-        size = [commTools newLabelSizeWithContent:note.mendTime Font:FONT_12 IsSngle:YES Width:0];
-        CGFloat timeX = kSZYNoteShowCellSpacing;
-        CGFloat timeY = CGRectGetMaxY(self.titleLabelFrame) + kSZYNoteShowCellVerticalSpacing;
-        self.timeLabelFrame = CGRectMake(timeX, timeY, size.width, size.height);
-        
-        //正文
-        CGFloat contentX = kSZYNoteShowCellSpacing;
-        CGFloat contentW = UIScreenWidth - 2 * contentX;
-        CGFloat contentY = CGRectGetMaxY(self.timeLabelFrame) + kSZYNoteShowCellVerticalSpacing;
-        if ([self checkIfKong:note.content]) {
-            //当正文不存在时，我们必须拿到下一个空间X，Y轴的起始位置
-            self.contentLabelFrame  = CGRectMake(contentX, CGRectGetMaxY(self.timeLabelFrame), 0, 0);
-        }else{
-            size = [commTools newLabelSizeWithContent:[note content] Font:FONT_14 IsSngle:YES Width:0];
-            self.contentLabelFrame = CGRectMake(contentX, contentY, contentW, size.height);
-        }
-        
-        //图片
-        CGFloat myImageViewX = kSZYNoteShowCellSpacing;
-        CGFloat myImageViewY = CGRectGetMaxY(self.contentLabelFrame) + 3*kSZYNoteShowCellVerticalSpacing;
-        if ([self checkIfKong:note.image]) {
-            self.myImageViewFrame = CGRectMake(myImageViewX, CGRectGetMaxY(self.contentLabelFrame), 0, 0);
-        }else{
-            self.myImageViewFrame = CGRectMake(myImageViewX, myImageViewY, kSZYNoteShowCellImageWidth,kSZYNoteShowCellImageHeight);
-        }
-        
-        //录音
-        CGFloat videoViewX = kSZYNoteShowCellSpacing;
-        CGFloat videoViewY = CGRectGetMaxY(self.myImageViewFrame) + 3*kSZYNoteShowCellVerticalSpacing;
-        if ([self checkIfKong:note.video]) {
-            self.videoViewFrame = CGRectMake(videoViewX,CGRectGetMaxY(self.myImageViewFrame), 0, 0);
-        }else{
-            
-            self.videoViewFrame = CGRectMake(videoViewX, videoViewY, kSZYNoteShowCellVideoWidth, kSZYNoteShowCellVideoHeight);
-            self.videoIconFrame = CGRectMake(SIZ(6), (kSZYNoteShowCellVideoHeight-kSZYNoteShowCellVideoIconHeight)/2, kSZYNoteShowCellVideoIconWidth, kSZYNoteShowCellVideoIconHeight);
-            
-            self.fileNameFrame = CGRectMake(CGRectGetMaxX(self.videoIconFrame)+SIZ(3), (kSZYNoteShowCellVideoHeight-2*kSZYNoteShowCellFileInfoHeight)/2, SIZ(170), kSZYNoteShowCellFileInfoHeight);
-            self.fileSizeFrame = CGRectMake(CGRectGetMaxX(self.videoIconFrame)+SIZ(3), CGRectGetMaxY(self.fileNameFrame), SIZ(70), kSZYNoteShowCellFileInfoHeight);
-            
-            self.arrowIconFrame = CGRectMake(kSZYNoteShowCellVideoWidth-SIZ(6)-kSZYNoteShowCellArrowIconWidth, (kSZYNoteShowCellVideoHeight-kSZYNoteShowCellArrowIconHeight)/2, kSZYNoteShowCellArrowIconWidth, kSZYNoteShowCellArrowIconHeight);
-        }
+        //cell高度
+        _cellHeight = CGRectGetMaxY(_allInfoBtnFrame) + kItemVerticalSpacing/2;
 
-        self.cellHeight = CGRectGetMaxY(self.videoViewFrame) + SIZ(10);
-
-        
     }
     return self;
-   
 }
 
--(BOOL)checkIfKong:(NSString *)value{
-    
-    if (!value || [value isEqualToString:@""]) {
-        return YES;
+- (void)noteImageViewFrameMake:(SZYNoteModel *)note {
+    //图片图标
+    if ([self isEmpty:note.image]) {
+        _noteImageViewFrame = CGRectMake(kItemLeadingSpacing, kItemVerticalSpacing+2, 0, 0);
+        currentX = CGRectGetMaxX(_noteImageViewFrame);
+    }else{
+        _noteImageViewFrame = CGRectMake(kItemLeadingSpacing, kItemVerticalSpacing+2, kImageViewWidth, kImageViewHeight);
+        currentX = CGRectGetMaxX(_noteImageViewFrame)+kItemHorizontalSpacing;
     }
-    return NO;
+}
+- (void)noteVideoViewFrame:(SZYNoteModel *)note {
+    //录音图标
+    if ([self isEmpty:note.video]) {
+        _noteVideoViewFrame = CGRectMake(currentX, kItemVerticalSpacing+2, 0, 0);
+        currentX = CGRectGetMaxX(_noteVideoViewFrame);
+    }else{
+        _noteVideoViewFrame = CGRectMake(currentX, kItemVerticalSpacing+2, kImageViewWidth, kImageViewHeight);
+        currentX = CGRectGetMaxX(_noteVideoViewFrame) + kItemHorizontalSpacing;
+    }
+}
+
+- (void)titleLabelFrameMake:(SZYNoteModel *)note {
+    //标题
+    CGFloat titleX = currentX;
+    CGFloat titleY = kItemVerticalSpacing;
+    CGFloat titleW = kTitleLabelWidth;
+    if ([self isEmpty:note.image]) titleW += (kImageViewWidth+kItemHorizontalSpacing);
+    if ([self isEmpty:note.video]) titleW += (kImageViewWidth+kItemHorizontalSpacing);
+    CGSize size = [note.title sizeWithAttributes:@{NSFontAttributeName:FONT_17}];
+    _titleLabelFrame = CGRectMake(titleX , titleY , titleW, size.height);
     
+}
+
+- (void)timeLabelFrameMake:(SZYNoteModel *)note {
+    //时间
+    CGSize size = [note.mendTime sizeWithAttributes:@{NSFontAttributeName:FONT_12}];
+    CGFloat timeX = UIScreenWidth - kItemLeadingSpacing - size.width;
+    CGFloat timeY = CGRectGetMaxY(_titleLabelFrame)-size.height;
+    _timeLabelFrame = CGRectMake(timeX, timeY, size.width, size.height);
+}
+
+- (void)contentLabelFrameMake:(SZYNoteModel *)note {
+
+    if ([self isEmpty:[note contentAtLocal]]) {
+        _contentLabelFrame  = CGRectMake(kItemLeadingSpacing, CGRectGetMaxY(_titleLabelFrame)+ kItemVerticalSpacing/2, 0, 0);
+        _allInfoBtnFrame = [self allInfoBtnFrameMakeWithState:NO];
+    }else{
+        
+        [self adaptContentLabelFrame:[note contentAtLocal]];
+    }
+}
+
+-(void)adaptContentLabelFrame:(NSString *)content{
+    
+    //正文
+    CGFloat contentX = kItemLeadingSpacing;
+    CGFloat contentW = UIScreenWidth - 2 * contentX;
+    CGFloat contentY = CGRectGetMaxY(_titleLabelFrame) + kItemVerticalSpacing/2;
+    CGSize size = [content boundingRectWithSize:CGSizeMake(contentW, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:FONT_16} context:nil].size;
+    _contentHeight = size.height;
+    
+    switch (_type) {
+            
+        case SZYCellStateType_Part: {
+            
+            if (_contentHeight < 40) {
+                _contentLabelFrame = CGRectMake(contentX, contentY, contentW, _contentHeight);
+                //没有按钮
+                _allInfoBtnFrame = [self allInfoBtnFrameMakeWithState:NO];
+            }else{
+                _contentLabelFrame = CGRectMake(contentX, contentY, contentW, kPartContentHeight);
+                //有按钮
+                _allInfoBtnFrame = [self allInfoBtnFrameMakeWithState:YES];
+            }
+
+            break;
+        }
+        case SZYCellStateType_All: {
+            
+            if (_contentHeight >= 40 && _contentHeight < 150) {
+                _contentLabelFrame = CGRectMake(contentX, contentY, contentW, _contentHeight);
+                _allInfoBtnFrame = [self allInfoBtnFrameMakeWithState:YES];
+            }else if (_contentHeight > 150){
+                _contentLabelFrame = CGRectMake(contentX, contentY, contentW, kAllContentHeight);
+                _allInfoBtnFrame = [self allInfoBtnFrameMakeWithState:YES];
+            }
+
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+-(CGRect)allInfoBtnFrameMakeWithState:(BOOL)isShow{
+    if (!isShow) {
+        return  CGRectMake(0, CGRectGetMaxY(_contentLabelFrame), 0, 0);
+    }else{
+        return  CGRectMake(kItemLeadingSpacing, CGRectGetMaxY(_contentLabelFrame), 60, 25);
+    }
+}
+
+
+-(BOOL)isEmpty:(NSString *)value{
+    return (!value || [value isEqualToString:@""]);
 }
 
 

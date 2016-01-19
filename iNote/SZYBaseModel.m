@@ -10,10 +10,6 @@
 
 @implementation SZYBaseModel
 
-+(id)modalWithID{
-    
-    return nil;
-}
 
 +(instancetype)modelWithDict:(NSDictionary *)dict{
     

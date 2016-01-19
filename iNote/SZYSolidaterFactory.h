@@ -7,10 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SZYLocalManagerType.h"
+#import "SZYNoteSolidater.h"
+#import "SZYNoteBookSolidater.h"
 
 @interface SZYSolidaterFactory : NSObject
-
-+(id)solidaterFctoryWithType:(SZYLocalManagerType)type;
+/**
+ *  根据类名创建对应的数据库业务类
+ *
+ *  @param type 类名
+ *
+ *  @return 数据库业务类实例xxSolidater
+ */
++(id)solidaterFctoryWithType:(NSString *)type;
 
 @end

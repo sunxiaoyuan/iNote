@@ -44,6 +44,7 @@
         self.satrBtn = [[UIButton alloc]init];
         self.satrBtn.tag = 101;
         [self.satrBtn setTitle:@"收 藏" forState:UIControlStateNormal];
+        [self.satrBtn setTitle:@"已收藏" forState:UIControlStateSelected];
         [self.satrBtn setTitleColor:UIColorFromRGB(0x888888) forState:UIControlStateNormal];
         [self.satrBtn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.bottomView addSubview:self.satrBtn];

@@ -13,10 +13,18 @@
 +(NSString *)szyTimeStamp{
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    formatter.dateFormat = @"yyyy/MM/dd HH:mm";
     NSString *str = [formatter stringFromDate:[NSDate date]];
     
     return str;
+}
+
++(long)currentTimeStampWithLongFormat{
+    
+    long time;
+    NSDate *fromdate=[NSDate date];
+    time=(long)[fromdate timeIntervalSince1970];
+    return time;
 }
 
 @end

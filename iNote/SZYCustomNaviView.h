@@ -7,23 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SZYNoteBookModel.h"
+#import "SZYOpenListView.h"
+#import "SZYCustomNaviViewDelegate.h"
 
-@protocol SZYCustomNaviViewDelegate <NSObject>
 
--(void)customNaviViewSyncButtonClick:(UIButton *)sender;//点击同步
--(void)customNaviViewOpenNoteBookListClick:(UITapGestureRecognizer *)sender;//点击下拉列表
--(void)customNaviViewLeftMenuClick:(UIButton *)sender;//点击左侧列表
--(void)customNaviViewRightSearchClick:(UIButton *)sender;//点击搜索
-
-@end
-
-@interface SZYCustomNaviView : UIView
+@interface SZYCustomNaviView : UIView<SZYOpenListViewDelegate>
 
 @property (nonatomic, assign  ) id<SZYCustomNaviViewDelegate> delegate;
-@property (nonatomic, strong  ) UIImageView               *arrowImageView;
 
-
--(void)setCurrentNoteBookName:(NSString *)name NoteBookNumber:(NSString *)number;
+-(void)setNoteBooksData:(NSMutableArray *)noteBookArr;
 
 @end

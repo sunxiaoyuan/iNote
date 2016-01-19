@@ -31,12 +31,10 @@
 +(void)initialize{
     
     UINavigationBar *bar = [UINavigationBar appearanceWhenContainedIn:self, nil];
-    
-    [bar setBackgroundImage:[UIImage imageNamed:@"recomend_btn_gone"] forBarMetrics:UIBarMetricsDefault];
-    
-//    UIImageView *bgImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"recomend_btn_gone"]];
-//    bgImageView.frame = CGRectMake(0, -20, UIScreenWidth, 64);
-//    [bar insertSubview:bgImageView atIndex:1];
+
+    //需要处理一下背景图片，做一个拉伸处理
+    //参数为UIEdgeInsetsMake(0, 0, 0, 0)时，代表我们未对原始图像的任何区域进行保护，会被整体拉伸
+    [bar setBackgroundImage:[[UIImage imageNamed:@"recomend_btn_gone"]resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 0, 0) resizingMode:UIImageResizingModeStretch] forBarMetrics:UIBarMetricsDefault];
     
     //去掉导航条的半透明
     bar.translucent = NO;

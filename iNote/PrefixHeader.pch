@@ -18,10 +18,14 @@
 #import "UIViewController+Create.h"
 #import "UIView+SZY.h"
 #import "AppDelegate.h"
-#import "SZYLocalManagerFactory.h"
 #import "SZYSolidaterFactory.h"
 #import "NSObject+Solidater.h"
+#import "NSObject+SZYKit.h"
 #import "SZYUser.h"
+#import <UIKit/UIKit.h>
+#import "FMDatabaseQueue.h"
 
+//去除“使用了不推荐使用的方法”的警告
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 #endif

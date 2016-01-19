@@ -10,9 +10,9 @@
 
 @protocol SZYToolViewDelegate <NSObject>
 
--(void)addPictureClick;
--(void)addVideoClick;
--(void)adjustFontClick;
+-(void)addPictureClick:(UIButton *)sender;
+-(void)addVideoClick:(UIButton *)sender;
+-(void)adjustFontClick:(UIButton *)sender;
 -(void)hideKeyBoardClick;
 
 @end

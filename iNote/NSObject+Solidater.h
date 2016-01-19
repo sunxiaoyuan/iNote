@@ -11,6 +11,9 @@
 
 @interface NSObject (Solidater)
 
+//完成任何对象的一键固化
 -(void)solidateDataWithKey:(NSString *)key;
+
++(id)unsolidateByKey:(NSString *)key;
 
 @end

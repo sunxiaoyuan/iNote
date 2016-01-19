@@ -12,267 +12,272 @@
 #import "AFViewShaker.h"
 #import "UITextField+Validator.m"
 
+
+
 @interface SZYRegViewController ()<UITextFieldDelegate>
-
-
-
-//输入框
-@property (nonatomic, strong) UITextField *phoneTextField;
-@property (nonatomic, strong) UITextField *nickNameTextField;
-@property (nonatomic, strong) UITextField *pswTextField;
-@property (nonatomic, strong) UITextField *pswConfirmTextField;
-//输入框名称
-@property (nonatomic, strong) UILabel     *phoneLabel;
-@property (nonatomic, strong) UILabel     *nickNameLabel;
-@property (nonatomic, strong) UILabel     *pswLabel;
-@property (nonatomic, strong) UILabel     *pswConfirmLabel;
 //注册按钮
-@property (nonatomic, strong) UIButton    *regBtn;
-//是否有输入
-@property (nonatomic, assign) BOOL        isChanged;
-
+@property (nonatomic, strong) UIButton     *regBtn;
+//输入框
+@property (nonatomic, strong) UITextField  *phoneTextField;
+@property (nonatomic, strong) UITextField  *nickNameTextField;
+@property (nonatomic, strong) UITextField  *pswregTextField;
+@property (nonatomic, strong) UITextField  *pswConfirmTextField;
+@property (nonatomic,strong ) UIImageView  *phoneView;
+@property (nonatomic,strong ) UIImageView  *nickNameView;
+@property (nonatomic,strong ) UIImageView  *pswregView;
+@property (nonatomic,strong ) UIImageView  *pswConfirmView;
+@property (nonatomic,strong ) UIView       *regView;
+//震动
+@property (nonatomic,strong ) AFViewShaker  *phoneShaker;
+@property (nonatomic,strong ) AFViewShaker  *nickNameShaker;
+@property (nonatomic,strong ) AFViewShaker  *pswregShaker;
+@property (nonatomic,strong ) AFViewShaker  *pswConfirmShaker;
 
 @end
 
 @implementation SZYRegViewController
-
-- (void)viewDidLoad {
+-(void)viewDidLoad {
     [super viewDidLoad];
-
+    self.navigationItem.rightBarButtonItem = nil ;
+    
     self.view.backgroundColor = UIColorFromRGB(0xf4f4f4);
-    //去掉右上角按钮
-    self.navigationItem.rightBarButtonItem = nil;
-    //初始化UI
-    [self setUP];
+    
+    
+    // 加载组件
+    
+    [self.view addSubview:self.regView];
+    [self.regView addSubview:self.regBtn];
+    [self.regView addSubview:self.phoneTextField];
+    [self.regView addSubview:self.pswTextField];
+    [self.regView addSubview:self.nickNameTextField];
+    [self.regView addSubview:self.phoneView];
+    [self.regView addSubview:self.nickNameView];
+    [self.regView addSubview:self.pswregView];
+    [self.regView addSubview:self.pswConfirmView];
+    [self.regView addSubview:self.pswConfirmTextField];
+    
+    self.phoneShaker = [[AFViewShaker alloc]initWithView:self.phoneTextField];
+    self.nickNameShaker = [[AFViewShaker alloc]initWithView:self.nickNameTextField];
+    self.pswregShaker = [[AFViewShaker alloc]initWithView:self.pswregTextField];
+    self.pswConfirmShaker = [[AFViewShaker alloc]initWithView:self.pswConfirmTextField];
+    
     
 }
-
-
 -(void)viewWillAppear:(BOOL)animated{
+    
     [super viewWillAppear:animated];
     
-}
-
-#pragma mark - UITextFieldDelegate
-
--(BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if (textField == _phoneTextField) {
-        return [_nickNameTextField becomeFirstResponder];
-    }else if (textField == _nickNameTextField){
-        return [_pswTextField becomeFirstResponder];
-    }else if (textField == _pswTextField){
-        return [_pswConfirmTextField becomeFirstResponder];
-    }else{
-        [self restoreTextFieldName:_pswConfirmLabel textField:_pswConfirmTextField];
-        return [_pswConfirmTextField resignFirstResponder];
-    }
-}
-
--(BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    //注册底层图层
+    self.regView.frame = CGRectMake(25, 20, UIScreenWidth - 50, 300);
+    //输入框边框图层
+    CGFloat inputViewX = 15;
+    CGFloat inputViewW = self.regView.frame.size.width - 2 * inputViewX ;
+    CGFloat inputViewH = 44;
+    self.phoneView.frame = CGRectMake(inputViewX, 10, inputViewW, inputViewH);
+    self.nickNameView.frame = CGRectMake(inputViewX,CGRectGetMaxY(self.phoneView.frame)+10, inputViewW, inputViewH);
+    self.pswregView.frame = CGRectMake(inputViewX, CGRectGetMaxY(self.nickNameView.frame)+10, inputViewW, inputViewH);
+    self.pswConfirmView.frame = CGRectMake(inputViewX, CGRectGetMaxY(self.pswregView.frame)+10, inputViewW, inputViewH);
+    //输入框
+    CGFloat textFieldX = 20;
+    CGFloat textFieldW = self.regView.frame.size.width - 2 * textFieldX ;
+    CGFloat textFieldMarginY = 12;
+    CGFloat jiange = 2;
+    CGFloat textFieldH = inputViewH - 2 * jiange;
+    self.phoneTextField.frame = CGRectMake(textFieldX, textFieldMarginY, textFieldW, textFieldH);
+    self.nickNameTextField.frame = CGRectMake(textFieldX, self.nickNameView.frame.origin.y+jiange, textFieldW, textFieldH);
+    self.pswregTextField.frame = CGRectMake(textFieldX, self.pswregView.frame.origin.y+jiange, textFieldW, textFieldH);
+    self.pswConfirmTextField.frame = CGRectMake(textFieldX, self.pswConfirmView.frame.origin.y+jiange, textFieldW, textFieldH);
+    //注册按钮
+    self.regBtn.frame = CGRectMake((self.regView.frame.size.width-textFieldW)/2, CGRectGetMaxY(self.pswConfirmView.frame)+30, textFieldW, 44);
     
-    if (textField == _phoneTextField) {
-        
-        [self diminishTextFieldName:_phoneLabel];
-        [self restoreTextFieldName:_nickNameLabel textField:_nickNameTextField];
-        [self restoreTextFieldName:_pswLabel textField:_pswTextField];
-        [self restoreTextFieldName:_pswConfirmLabel textField:_pswConfirmTextField];
-        
-    }else if (textField == _nickNameTextField){
-        
-        [self restoreTextFieldName:_phoneLabel textField:_phoneTextField];
-        [self diminishTextFieldName:_nickNameLabel];
-        [self restoreTextFieldName:_pswLabel textField:_pswTextField];
-        [self restoreTextFieldName:_pswConfirmLabel textField:_pswConfirmTextField];
-        
-    }else if (textField == _pswTextField){
-        
-        [self restoreTextFieldName:_phoneLabel textField:_phoneTextField];
-        [self restoreTextFieldName:_nickNameLabel textField:_nickNameTextField];
-        [self diminishTextFieldName:_pswLabel];
-        [self restoreTextFieldName:_pswConfirmLabel textField:_pswConfirmTextField];
-
-    }else if (textField == _pswConfirmTextField){
-        
-        [self restoreTextFieldName:_phoneLabel textField:_phoneTextField];
-        [self restoreTextFieldName:_nickNameLabel textField:_nickNameTextField];
-        [self restoreTextFieldName:_pswLabel textField:_pswTextField];
-        [self diminishTextFieldName:_pswConfirmLabel];
-        
-    }
+    
+}
+#pragma mark - TextFieldDelegate
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [self hideRegKeyboard];
     return YES;
 }
 
-- (void)diminishTextFieldName:(UILabel *)label{
-    
-    [UIView animateWithDuration:0.5 animations:^{
-        label.transform = CGAffineTransformMakeTranslation(0, -SIZ(17));
-        label.textColor = ThemeColor;
-        label.font = FONT_10;
-    }];
-}
-
-- (void)restoreTextFieldName:(UILabel *)label textField:(UITextField *)textFieled{
-    //检查将要改变的输入框内，是否有文本
-    [self checkTextFieldChange:textFieled];
-    if (self.isChanged) {
-        [UIView animateWithDuration:0.5 animations:^{
-            label.transform = CGAffineTransformIdentity;
-            label.textColor = [UIColor grayColor];
-            label.font = FONT_16;
-        }];
-    }
-}
-
-- (void)checkTextFieldChange:(UITextField *)textField{
-    if (textField.text.length != 0) {
-        self.isChanged = NO;
-    } else {
-        self.isChanged = YES;
-    }
-}
-
-#pragma mark - 点击空白处
+#pragma mark - 响应方法
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
-    
-    [self.view endEditing:YES];
-    [self restoreTextFieldName:_phoneLabel textField:_phoneTextField];
-    [self restoreTextFieldName:_nickNameLabel textField:_nickNameTextField];
-    [self restoreTextFieldName:_pswLabel textField:_pswTextField];
-    [self restoreTextFieldName:_pswConfirmLabel textField:_pswConfirmTextField];
+    [self hideRegKeyboard];
 }
-#pragma mark - 私有方法
-
-
-
--(void)back:(UIButton *)sender{
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
--(void)setUP{
-    
-    
-    
-    UIView* vLogin = [[UIView alloc] initWithFrame:CGRectMake(SIZ(15), SIZ(50), UIScreenWidth - SIZ(30), SIZ(300))];
-    vLogin.layer.borderWidth = 0.5;
-    vLogin.layer.cornerRadius = 8;
-    vLogin.layer.masksToBounds = YES;
-    vLogin.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-    vLogin.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:vLogin];
-    
-    SZYInputText *inputText = [[SZYInputText alloc]init];
-    CGFloat centerX = vLogin.frame.size.width /2;
-    
-    //手机号
-    _phoneTextField = [inputText setupWithIcon:nil textY:SIZ(20) centerX:centerX point:nil];
-    _phoneTextField.delegate = self;
-    [_phoneTextField setReturnKeyType:UIReturnKeyNext];
-    _phoneTextField.keyboardType = UIKeyboardTypePhonePad;
-    _phoneTextField.textColor = [UIColor grayColor];
-    _phoneTextField.tintColor = [UIColor grayColor];
-    [vLogin addSubview:_phoneTextField];
-    _phoneLabel = [self setupTextName:@"手机号" OnTextField:_phoneTextField];
-    [_phoneTextField addSubview:_phoneLabel];
-    
-    //昵称
-    _nickNameTextField = [inputText setupWithIcon:nil textY:CGRectGetMaxY(_phoneTextField.frame)+SIZ(20) centerX:centerX point:nil];
-    _nickNameTextField.delegate = self;
-    [_nickNameTextField setReturnKeyType:UIReturnKeyNext];
-    _nickNameTextField.textColor = [UIColor grayColor];
-    _nickNameTextField.tintColor = [UIColor grayColor];
-    [vLogin addSubview:_nickNameTextField];
-    _nickNameLabel = [self setupTextName:@"昵称" OnTextField:_nickNameTextField];
-    [_nickNameTextField addSubview:_nickNameLabel];
-    
-    //密码
-    _pswTextField = [inputText setupWithIcon:nil textY:CGRectGetMaxY(_nickNameTextField.frame)+SIZ(20) centerX:centerX point:nil];
-    _pswTextField.delegate = self;
-    [_pswTextField setReturnKeyType:UIReturnKeyNext];
-    [_pswTextField setSecureTextEntry:YES];
-    _pswTextField.textColor = [UIColor grayColor];
-    _pswTextField.tintColor = [UIColor grayColor];
-    [vLogin addSubview:_pswTextField];
-    _pswLabel = [self setupTextName:@"密码" OnTextField:_pswTextField];
-    [_pswTextField addSubview:_pswLabel];
-    
-    //确认密码
-    _pswConfirmTextField = [inputText setupWithIcon:nil textY:CGRectGetMaxY(_pswTextField.frame)+SIZ(20) centerX:centerX point:nil];
-    _pswConfirmTextField.delegate = self;
-    [_pswConfirmTextField setReturnKeyType:UIReturnKeyDone];
-    [_pswConfirmTextField setSecureTextEntry:YES];
-    _pswConfirmTextField.textColor = [UIColor grayColor];
-    _pswConfirmTextField.tintColor = [UIColor grayColor];
-    [vLogin addSubview:_pswConfirmTextField];
-    _pswConfirmLabel = [self setupTextName:@"确认密码" OnTextField:_pswConfirmTextField];
-    [_pswConfirmTextField addSubview:_pswConfirmLabel];
-    
-    //注册
-    _regBtn = [SZYMenuButton buttonWithType:UIButtonTypeCustom];
-    [_regBtn setBackgroundImage:[UIImage imageNamed:@"btn_bg_blue"] forState:UIControlStateNormal];
-    _regBtn.frame = CGRectMake(SIZ(30), CGRectGetMaxY(vLogin.frame) + SIZ(20), UIScreenWidth-SIZ(60), SIZ(50));
-    [_regBtn setTitle:@"注   册" forState:UIControlStateNormal];
-    [_regBtn addTarget:self action:@selector(regClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:_regBtn];
+-(void)hideRegKeyboard{
+    [self.phoneTextField resignFirstResponder];
+    [self.nickNameTextField resignFirstResponder];
+    [self.pswregTextField resignFirstResponder];
+    [self.pswConfirmTextField resignFirstResponder];
     
 }
-
-- (UILabel *)setupTextName:(NSString *)textName OnTextField:(UITextField *)textField
-{
-    UILabel *textNameLabel = [[UILabel alloc] init];
-    textNameLabel.text = textName;
-    textNameLabel.font = FONT_16;
-    textNameLabel.textColor = [UIColor grayColor];
-    textNameLabel.frame = CGRectMake(0, 0, textField.frame.size.width, textField.frame.size.height);
-    return textNameLabel;
-}
-
 -(void)regClick{
-    if ([_phoneTextField isNotEmpty]) {
-        if ([_nickNameTextField isNotEmpty]) {
-            if ([_pswTextField isNotEmpty]) {
-                if ([_pswConfirmTextField isNotEmpty]) {
-                    if ([_phoneTextField validatePhoneNumber]) {
-                        if ([_pswTextField validatePassWord]) {
-                            if ([_pswConfirmTextField.text isEqualToString:_pswTextField.text]) {
-                                
-                                //注册成功
-                                NSLog(@"注册成功");
-                                //返回登录界面
-                                [self.navigationController popViewControllerAnimated:YES];
-                                
-                                
-                            }else{
-                                [self showAlertWithMsg:@"确认密码不一致"];
-                            }
-                        }else{
-                            [self showAlertWithMsg:@"请输入6～12位密码"];
-                        }
-                    }else{
-                        [self showAlertWithMsg:@"请输入11位有效手机号码"];
-                    }
-                }else{
-                    [[[AFViewShaker alloc]initWithView:_pswConfirmTextField] shake];
-                }
-            }else{
-                [[[AFViewShaker alloc]initWithView:_pswTextField] shake];
-            }
+    BOOL valide = [self.phoneTextField isNotEmpty];
+    if (valide) {
+        valide = [self.nickNameTextField isNotEmpty];
+    }else{
+        [self.phoneShaker shake];
+        return;
+    }
+    if (valide) {
+        valide = [self.pswregTextField isNotEmpty];
+    }else{
+        [self.nickNameShaker shake];
+        return;
+    }
+    if (valide) {
+        valide = [self.pswConfirmTextField isNotEmpty];
+    }else{
+        [self.pswregShaker shake];
+        return;
+    }
+    if (valide) {
+        valide = [self.phoneTextField validatePhoneNumber];
+    }else{
+        [self.pswConfirmShaker shake];
+        return;
+    }
+    if (valide) {
+        valide = [self.pswregTextField validatePassWord];
+    }else{
+        [self showRegMessage:@"请输入11位有效手机号码" becomeFirstResponder:self.phoneTextField];
+        return;
+    }
+    if (valide) {
+        if ([self.pswregTextField.text isEqualToString: self.pswConfirmTextField.text]) {
+            [self showRegMessage:@"注册成功！请返回到登录界面进行登录" becomeFirstResponder:nil];
         }else{
-            [[[AFViewShaker alloc]initWithView:_nickNameTextField] shake];
+            [self showRegMessage:@"两次输入密码不一致，请重新进行密码设置" becomeFirstResponder:self.pswConfirmTextField];
+            return;
         }
     }else{
-        [[[AFViewShaker alloc]initWithView:_phoneTextField] shake];
+        [self showRegMessage:@"请输入6～20位密码" becomeFirstResponder:self.pswregTextField];
+        return;
     }
-}
-
--(void)showAlertWithMsg:(NSString *)msg{
     
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:msg delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-    [alert show];
 }
-
+-(void)showRegMessage:(NSString *)msg becomeFirstResponder:(UITextField *) textField{
+    UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"提示" message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"我知道了" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        if (textField) {
+            [textField becomeFirstResponder];
+        }
+    }];
+    [alertVC addAction:okAction];
+    [self presentViewController:alertVC animated:YES completion:nil];
+    
+}
 
 #pragma mark - getters
-
-
+-(UITextField *)phoneTextField{
+    if (!_phoneTextField) {
+        _phoneTextField = [[UITextField alloc]init];
+        _phoneTextField.delegate = self ;
+        _phoneTextField.placeholder = @"请输入注册手机号码";
+        _phoneTextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        _phoneTextField.keyboardType = UIKeyboardTypePhonePad;
+        //左侧图层
+        _phoneTextField.leftView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+        _phoneTextField.leftViewMode = UITextFieldViewModeAlways;
+        UIImageView *imgUser = [[UIImageView alloc]initWithFrame:CGRectMake(12, 12, 16, 16)];
+        imgUser.image = [UIImage imageNamed:@"iconfont-user"];
+        [_phoneTextField.leftView addSubview:imgUser];
+    }
+    return _phoneTextField;
+}
+-(UITextField *)nickNameTextField{
+    if (!_nickNameTextField) {
+        _nickNameTextField = [[UITextField alloc]init];
+        _nickNameTextField.delegate = self ;
+        _nickNameTextField.placeholder = @"请输入昵称";
+        _nickNameTextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        _nickNameTextField.returnKeyType = UIReturnKeyNext;
+        //左侧图层
+        _nickNameTextField.leftView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+        _nickNameTextField.leftViewMode = UITextFieldViewModeAlways;
+        UIImageView *imgUser = [[UIImageView alloc]initWithFrame:CGRectMake(12, 12, 16, 16)];
+        imgUser.image = [UIImage imageNamed:@"iconfont-user"];
+        [_nickNameTextField.leftView addSubview:imgUser];
+    }
+    return _nickNameTextField;
+}
+-(UITextField *)pswTextField{
+    if (!_pswregTextField) {
+        _pswregTextField = [[UITextField alloc]init];
+        _pswregTextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        _pswregTextField.delegate = self ;
+        _pswregTextField.placeholder = @"请设置您的密码";
+        _pswregTextField.secureTextEntry = YES;
+        _pswregTextField.returnKeyType = UIReturnKeyNext;
+        //左侧图层
+        _pswregTextField.leftView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+        _pswregTextField.leftViewMode = UITextFieldViewModeAlways;
+        UIImageView *imgUser = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, 20, 20)];
+        imgUser.image = [UIImage imageNamed:@"iconfont-password"];
+        [_pswregTextField.leftView addSubview:imgUser];
+    }
+    return  _pswregTextField;
+}
+-(UITextField *)pswConfirmTextField{
+    if (!_pswConfirmTextField) {
+        _pswConfirmTextField = [[UITextField alloc]init];
+        _pswConfirmTextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        _pswConfirmTextField.delegate = self ;
+        _pswConfirmTextField.placeholder = @"请确认您的密码";
+        _pswConfirmTextField.secureTextEntry = YES;
+        _pswConfirmTextField.returnKeyType = UIReturnKeyDone;
+        //左侧图层
+        _pswConfirmTextField.leftView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+        _pswConfirmTextField.leftViewMode = UITextFieldViewModeAlways;
+        UIImageView *imgUser = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, 20, 20)];
+        imgUser.image = [UIImage imageNamed:@"iconfont-password"];
+        [_pswConfirmTextField.leftView addSubview:imgUser];
+    }
+    return  _pswConfirmTextField;
+}
+-(UIButton *)regBtn{
+    if (!_regBtn) {
+        _regBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_regBtn setBackgroundImage:[UIImage imageNamed:@"btn_bg_blue"] forState:UIControlStateNormal];
+        [_regBtn setTitle:@"注   册" forState:UIControlStateNormal];
+        [_regBtn addTarget:self action:@selector(regClick) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return  _regBtn;
+}
+-(UIView *)regView{
+    if (!_regView) {
+        _regView = [[UIView alloc]init];
+        _regView.backgroundColor = self.view.backgroundColor;
+        //   _regView.backgroundColor = [UIColor grayColor];
+        
+    }
+    return _regView;
+}
+-(UIImageView *)phoneView{
+    if (!_phoneView) {
+        _phoneView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"login_input"]];
+        
+    }
+    return _phoneView;
+}
+-(UIImageView *)nickNameView{
+    if (!_nickNameView) {
+        _nickNameView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"login_input"]];
+        
+    }
+    return _nickNameView;
+}
+-(UIImageView *)pswregView{
+    if (!_pswregView) {
+        _pswregView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"login_input"]];
+        
+    }
+    return _pswregView;
+}
+-(UIImageView *)pswConfirmView{
+    if (!_pswConfirmView) {
+        _pswConfirmView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"login_input"]];
+        
+    }
+    return _pswConfirmView;
+}
 
 @end

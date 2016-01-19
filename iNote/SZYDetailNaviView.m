@@ -15,6 +15,8 @@
 
 @interface SZYDetailNaviView ()
 
+@property (nonatomic, strong) UIButton          *doneBtn;
+@property (nonatomic, strong) UIButton          *moreBtn;
 @property (nonatomic, strong) UIButton          *backBtn;
 @property (nonatomic, strong) UIImageView       *backgroundImageView;
 
@@ -35,20 +37,20 @@
         //添加左侧back按钮
         self.backBtn = [[UIButton alloc]init];
         [self.backBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-        [self.backBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.backBtn addTarget:self action:@selector(backClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.backBtn];
         
         //添加更多按钮
         self.moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.moreBtn setImage:[UIImage imageNamed:@"more"] forState:UIControlStateNormal];
-        [self.moreBtn addTarget:self action:@selector(moreClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.moreBtn addTarget:self action:@selector(moreClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.moreBtn];
         
         //完成按钮
         self.doneBtn = [[UIButton alloc]init];
         [self.doneBtn setTitle:@"完成" forState:UIControlStateNormal];
         [self.doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [self.doneBtn addTarget:self action:@selector(doneBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.doneBtn addTarget:self action:@selector(doneBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         self.doneBtn.hidden = YES;
         [self addSubview:self.doneBtn];
     
@@ -65,30 +67,58 @@
     
     //两侧按钮
     self.backBtn.frame = CGRectMake(kBackBtnX, kBackBtnY, kBackBtnWidth, kBackBtnHeight);
-    self.moreBtn.frame = CGRectMake(w - 38, 27.5, 27, 27);
+    self.moreBtn.frame = CGRectMake(w - 43, 27.5, 27, 27);
     self.doneBtn.frame = CGRectMake(w - 56, 22, 40, 40);
     
 }
 
 #pragma mark - 点击事件
 
--(void)backClick{
+-(void)backClick:(UIButton *)sender{
     
-    [self.delegate backBtnDidClick];
+    [self.delegate customNaviViewLeftMenuClick:sender];
 }
 
--(void)moreClick{
+-(void)moreClick:(UIButton *)sender{
     
-    if ([self.delegate respondsToSelector:@selector(moreBtnDidclick)]) {
-        [self.delegate moreBtnDidclick];
+    if ([self.delegate respondsToSelector:@selector(moreBtnDidclick:)]) {
+        [self.delegate moreBtnDidclick:sender];
     }
     
 }
--(void)doneBtnClick{
+-(void)doneBtnClick:(UIButton *)sender{
     
-    if ([self.delegate respondsToSelector:@selector(doneBtnDidClick)]) {
-        [self.delegate doneBtnDidClick];
+    if ([self.delegate respondsToSelector:@selector(doneBtnDidClick:)]) {
+        [self.delegate doneBtnDidClick:sender];
     }
+}
+
+#pragma mark - 公开方法
+-(void)enterEditingState{
+    //隐藏“更多”
+    self.moreBtn.hidden = YES;
+    self.moreBtn.enabled= NO;
+    //显示“完成”
+    self.doneBtn.hidden = NO;
+    self.doneBtn.enabled = YES;
+}
+
+-(void)exitEditingState{
+    //显示“更多”
+    self.moreBtn.hidden = NO;
+    self.moreBtn.enabled = YES;
+    //隐藏“完成”
+    self.doneBtn.hidden = YES;
+    self.doneBtn.enabled = NO;
+}
+
+-(void)hideBarButton{
+    [self.doneBtn removeFromSuperview];
+    [self.moreBtn removeFromSuperview];
+}
+
+-(void)removeMoreBtn{
+    [self.moreBtn removeFromSuperview];
 }
 
 @end

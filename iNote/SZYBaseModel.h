@@ -7,14 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NSString+Random.h"
+#import "NSString+SZYKit.h"
 #import "SZYLocalFileManager.h"
+#import "MJExtension.h"
 
 @interface SZYBaseModel : NSObject
 
-//初始化的类方法
+//根据字典初始化对象
 +(instancetype)modelWithDict:(NSDictionary *)dict;
-
-+(id)modalWithID;
 
 @end

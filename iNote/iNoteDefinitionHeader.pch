@@ -21,7 +21,7 @@
 #define UIColorFromRGBA(rgbValue, alphaValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0  blue:((float)(rgbValue & 0xFF))/255.0 alpha:alphaValue]
 
 #define ThemeColor UIColorFromRGB(0x00a2ff) //主题蓝色
-#define ViewBackgroundColor UIColorFromRGB(0xeaeaea) //view底色
+#define ViewBackgroundColor UIColorFromRGB(0xf4f4f4) //view底色，浅灰色
 
 //width height
 #define SIZ(a) (a)*FontScale
@@ -43,7 +43,7 @@
 
 #define SystemVersion     [[UIDevice currentDevice].systemVersion floatValue]
 #define kTabBarHeight     49
-#define NavigationBarHeight SystemVersion>= 7.0 ? 64:44
+#define NavigationBarHeight  64
 #define DifGap SystemVersion>= 7.0 ? 0.0 : 20.0
 #define NaviTopLineY SystemVersion>= 7.0 ? 20:-1
 #define FontScale UIScreenWidth/320.0
@@ -79,9 +79,11 @@
 
 //本地存储有关
 
+#define UDUserSession          @"user_session"
+
 #define kDEFAULT_NOTEBOOK_ID   @"iNoteDefaultNoteBookID"//默认笔记本id
-#define kTempUserID            @"TempUser"              //临时用户默认的id
-#define lTempUserPhoneNumber   @"TempUser"              //临时用户默认的手机号
+#define TempUserID             @"TempUser"              //临时用户默认的id
+#define TempUserPhoneNumber    @"TempUser"              //临时用户默认的手机号
 
 #define kNoteImageDir          @"NoteImage"
 #define kNoteVideoDir          @"NoteVideo"

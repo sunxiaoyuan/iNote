@@ -24,4 +24,7 @@ typedef void (^coverDidRomove)();
 - (void)leftMenuClick;
 - (void)rightSearchClick;
 
+-(void)addHub;
+-(void)removeHub;
+
 @end

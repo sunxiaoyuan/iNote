@@ -225,7 +225,7 @@ static CGFloat const kOffsetLeftHand = 60;
 //点击注册
 -(void)registerClick{
     
-    SZYRegViewController *regVC = [[SZYRegViewController alloc]initWithTitle:@"注册" BackButton:YES];
+    SZYRegViewController *regVC = [[SZYRegViewController alloc]initWithTitle:@"注册" BackButton:NO];
     [self.navigationController pushViewController:regVC animated:YES];
 }
 

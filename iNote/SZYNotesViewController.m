@@ -9,18 +9,21 @@
 #import "SZYNotesViewController.h"
 #import "SZYNoteModel.h"
 #import "SZYNoteBookModel.h"
-#import "SZYOpenListCellCell.h"
-#import "SZYNoteBookLocalmanager.h"
-#import "NSString+Random.h"
+#import "SZYNoteBookCell.h"
+#import "SZYNoteBookViewController.h"
+#import "MJRefresh.h"
+#import "SZYRefreshHeader.h"
 
 @interface SZYNotesViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
-@property (nonatomic, strong) UITableView      *tableView;
-@property (nonatomic, strong) NSMutableArray   *noteBookArr;
-@property (nonatomic, strong) NSIndexPath      *selectIndexPath;
-@property (nonatomic, strong) SZYNoteBookModel *selectNoteBook;
-@property (nonatomic, strong) UIButton         *addNoteBookBtn;
-
+@property (nonatomic, strong) UITableView          *tableView;//表视图
+@property (nonatomic, strong) NSMutableArray       *noteBookArr;
+@property (nonatomic, strong) NSIndexPath          *selectIndexPath;
+@property (nonatomic, strong) SZYNoteBookModel     *selectNoteBook;
+@property (nonatomic, strong) UIButton             *addNoteBookBtn;
+@property (nonatomic, strong) UIView               *sepLineView;
+@property (nonatomic, strong) UIButton             *rightBtn;
+@property (nonatomic, strong) SZYNoteBookSolidater *noteBookSolidater;
 @end
 
 @implementation SZYNotesViewController
@@ -28,14 +31,34 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setUpUI];
-    [self loadData];
     
+    //不需要系统自动处理顶部内容伸缩
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    //设置底色
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    //加载组件
+    [self.view addSubview:self.addNoteBookBtn];
+    [self.view addSubview:self.sepLineView];
+    [self.view addSubview:self.tableView];
+    //自定义右上角按钮
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
+    //初始化数据库工具
+    self.noteBookSolidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
 
+    //设置下拉刷新
+    [self setHeadRefresh];
+    
+    self.addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
+    self.sepLineView.frame = CGRectMake(0, 44, UIScreenWidth, 1);
+    self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
+}
 
 #pragma mark - TableViewDelegate和TableViewDataSource
+
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
 }
@@ -45,24 +68,30 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return SZYOpenListCellHeight;
+    return 120;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    static NSString *cellIdentifier = @"OpenListCell";
-    SZYOpenListCellCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    static NSString *cellIdentifier = @"NoteBookCell";
+    SZYNoteBookCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([SZYOpenListCellCell class]) owner:nil options:nil] lastObject];
+        cell = [[SZYNoteBookCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+
     }
     SZYNoteBookModel *noteBook = _noteBookArr[indexPath.row];
-    cell.nameLabel.text = noteBook.title;
-    cell.numberLabel.text = noteBook.noteNumber;
+    cell.titleLabel.text = noteBook.title;
+    cell.subTitleLabel.text = [NSString stringWithFormat:@"(%lu个笔记)",(unsigned long)[noteBook.noteList count]];
     return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    //调转到笔记列表页
+    SZYNoteBookModel *noteBook = _noteBookArr[indexPath.row];
+    //调转到笔记本展示界面
+    SZYNoteBookViewController *noteBookVC = [[SZYNoteBookViewController alloc]initWithTitle:noteBook.title BackButton:YES];
+    noteBookVC.currentNoteBook = noteBook;
+    [self.navigationController pushViewController:noteBookVC animated:YES];
     
 }
 
@@ -93,13 +122,16 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     
-    SZYNoteBookLocalmanager *manager = (SZYNoteBookLocalmanager *)[SZYLocalManagerFactory managerFactoryWithType:kNoteBookType];
-    manager.solidater = [SZYSolidaterFactory solidaterFctoryWithType:kNoteBookType];
-    
     if (alertView.tag == 101) { //提醒用户数据改变的alert
         if (buttonIndex == 1) {
-            //数据库中删除
-            [manager deleteModelById:self.selectNoteBook.noteBook_id];
+            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+                //数据库中删除
+                [_noteBookSolidater deleteOneByID:self.selectNoteBook.noteBook_id successHandler:^(id result) {
+                    
+                } failureHandler:^(NSString *errorMsg) {
+                    NSLog(@"error = %@",errorMsg);
+                }];
+            }];
             //数据源中删除(这一步容易遗忘)
             [self.noteBookArr removeObject:self.selectNoteBook];
             
@@ -110,62 +142,35 @@
         if (buttonIndex == 1) {
             UITextField *tf = [alertView textFieldAtIndex:0];
             SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]init];
-            newNoteBook.noteBook_id = [NSString RandomString];
+            newNoteBook.noteBook_id = [NSString stringOfUUID];
             newNoteBook.user_id_belonged = ApplicationDelegate.userSession.user_id;
             newNoteBook.title = tf.text;
             newNoteBook.isPrivate = @"NO";
-            [manager save:newNoteBook];
-            
+            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+                //插入一行笔记本数据
+                [_noteBookSolidater saveOne:newNoteBook successHandler:^(id result) {
+                    
+                } failureHandler:^(NSString *errorMsg) {
+                    NSLog(@"error = %@",errorMsg);
+                }];
+            }];
             [self loadData];
-            [self.tableView reloadData];
-
         }
     }
 }
 
 #pragma mark - 私有方法
 
--(void)setUpUI{
-    
-    //不需要系统自动处理顶部内容伸缩
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    //设置标题
-    self.title = @"笔记本";
-    //设置底色
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-    
-    //添加笔记本按钮
-    self.addNoteBookBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
-    [self.addNoteBookBtn setTitle:@"添加笔记" forState:UIControlStateNormal];
-    [self.addNoteBookBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.addNoteBookBtn addTarget:self action:@selector(addNoteBookBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    self.addNoteBookBtn.hidden = YES;
-    [self.view addSubview:self.addNoteBookBtn];
-    
-    //分割线
-    UIView *sepLine = [[UIView alloc]initWithFrame:CGRectMake(0, 44, UIScreenWidth, 1)];
-    sepLine.backgroundColor = UIColorFromRGB(0xdddddd);
-    [self.view addSubview:sepLine];
-    
-    //表格
-    self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, UIScreenWidth, UIScreenHeight) style:UITableViewStylePlain];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    self.tableView.backgroundColor = [UIColor whiteColor];
-    [self clearExtraLine:self.tableView];
-    [self.view addSubview:self.tableView];
-    
-    //导航栏右侧按钮
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn.backgroundColor = [UIColor clearColor];
-    btn.frame = CGRectMake(0, 0, SIZ(40), SIZ(40));
-    [btn setTitle:@"编辑" forState:UIControlStateNormal];
-    [btn setTitle:@"完成" forState:UIControlStateSelected];
-    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [btn addTarget:self action:@selector(editBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:btn];
-
+-(void)setHeadRefresh{
+    SZYRefreshHeader *header = [SZYRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
+    // 隐藏时间
+    header.lastUpdatedTimeLabel.hidden = YES;
+    // 隐藏状态
+    header.stateLabel.hidden = YES;
+    // 马上进入刷新状态
+    [header beginRefreshing];
+    // 设置header
+    self.tableView.header = header;
 }
 
 -(void)editBtnClick:(UIButton *)sender{
@@ -193,22 +198,23 @@
     
 }
 
-//去掉下方多余的线
--(void)clearExtraLine:(UITableView *)tableView{
-    UIView *view = [[UIView alloc]init];
-    view.backgroundColor = [UIColor clearColor];
-    [self.tableView setTableFooterView:view];
-}
-
-
+//加载数据，刷新视图
 -(void)loadData{
     //查询到当前用户id下的所有笔记本信息
     if (!self.noteBookArr) {
         self.noteBookArr = [NSMutableArray array];
     }
-    SZYNoteBookLocalmanager *noteBookLM = (SZYNoteBookLocalmanager *)[SZYLocalManagerFactory managerFactoryWithType:kNoteBookType];
-    noteBookLM.solidater = [SZYSolidaterFactory solidaterFctoryWithType:kNoteBookType];
-    self.noteBookArr = [noteBookLM noteBooksByUserId:ApplicationDelegate.userSession.user_id];
+    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+        [_noteBookSolidater readAllSuccessHandler:^(id result) {
+            self.noteBookArr = (NSMutableArray *)result;
+            //停止刷新
+            [self.tableView.header endRefreshing];
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"error = %@",errorMsg);
+
+        }];
+    }];
+    [self.tableView reloadData];
 }
 
 -(void)addNoteBookBtnClick{
@@ -218,6 +224,52 @@
     alert.tag = 102;
     [alert show];
 }
+
+#pragma mark - getters
+
+-(UIButton *)addNoteBookBtn{
+    if (!_addNoteBookBtn){
+        _addNoteBookBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_addNoteBookBtn setTitle:@"添加笔记" forState:UIControlStateNormal];
+        [_addNoteBookBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_addNoteBookBtn addTarget:self action:@selector(addNoteBookBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        _addNoteBookBtn.hidden = YES;
+    }
+    return _addNoteBookBtn;
+}
+-(UIView *)sepLineView{
+    if (!_sepLineView){
+        _sepLineView = [[UIView alloc]init];
+        _sepLineView.backgroundColor = UIColorFromRGB(0xdddddd);
+    }
+    return _sepLineView;
+}
+-(UITableView *)tableView{
+    if (!_tableView){
+        _tableView = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        _tableView.backgroundColor = [UIColor whiteColor];
+        UIView *view = [[UIView alloc]init];
+        view.backgroundColor = [UIColor whiteColor];
+        _tableView.tableFooterView = view;
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    }
+    return _tableView;
+}
+-(UIButton *)rightBtn{
+    if (!_rightBtn){
+        _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _rightBtn.backgroundColor = [UIColor clearColor];
+        _rightBtn.frame = CGRectMake(0, 0, SIZ(40), SIZ(40));
+        [_rightBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [_rightBtn setTitle:@"完成" forState:UIControlStateSelected];
+        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_rightBtn addTarget:self action:@selector(editBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _rightBtn;
+}
+
 
 
 

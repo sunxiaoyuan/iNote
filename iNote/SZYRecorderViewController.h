@@ -11,7 +11,7 @@
 
 @protocol SZYRecorderViewControllerDelegate <NSObject>
 
--(void)haveCompleteRecord:(NSString *)path;
+-(void)haveCompleteRecordAtTime:(NSString *)time;
 
 @end
 

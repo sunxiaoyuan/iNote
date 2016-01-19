@@ -9,8 +9,15 @@
 #import "SZYRecorderViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "SZYNoteModel.h"
+#import "NSDate+TimeStamp.h"
+#import "SZYSoundManager.h"
+#import "SZYSoundWaveView.h"
 
 @interface SZYRecorderViewController ()
+
+@property (strong, nonatomic) IBOutlet UIView *topView;
+@property (strong, nonatomic) IBOutlet UIView *bottomView;
+@property (strong, nonatomic) IBOutlet UILabel *timeLabel;
 
 //上下底层视图
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topViewHeightConstrsint;
@@ -30,16 +37,22 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelWidthConstrsint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelHeightConstrsint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelTopConstrsint;
-
+//完成
 - (IBAction)doneAction:(id)sender;
+//开始／暂停
 - (IBAction)startAction:(id)sender;
+//取消（返回）
 - (IBAction)cancelAction:(id)sender;
-- (IBAction)stopAction:(id)sender;
-
-@property (weak, nonatomic) IBOutlet UIProgressView *audioPower;
-@property (nonatomic, strong) AVAudioRecorder *audioRecorder;//音频录音机
-@property (nonatomic, strong) NSTimer *timer;//录音声波监控（注意这里暂时不对播放进行监控）
-
+//重置
+- (IBAction)clearAction:(id)sender;
+@property (strong, nonatomic) IBOutlet UIButton *clearbtn;
+@property (strong, nonatomic) IBOutlet UIButton *doneBtn;
+@property (strong, nonatomic) IBOutlet UIButton *cancelBtn;
+@property (nonatomic, assign) BOOL             isNeedNewRecorder;//是否需要创建新的录音设备
+@property (nonatomic, strong) SZYSoundManager  *soundManager;
+@property (nonatomic, strong) NSString         *startRecordTime;
+@property (nonatomic, strong) SZYSoundWaveView *soundWaveView;
+@property (nonatomic, strong) CADisplayLink    *meterUpdateDisplayLink;
 
 @end
 
@@ -48,7 +61,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     //设置音频会话
-    [self setAudioSession];
+    [SZYSoundManager setAudioSession];
+    //设置面板颜色
+    self.topView.backgroundColor = UIColorFromRGB(0x57bffc);
+    self.bottomView.backgroundColor = UIColorFromRGB(0x00a2ff);
+    //文字适配
+    self.timeLabel.font = FONT_16;
+    self.clearbtn.titleLabel.font = FONT_16;
+    self.doneBtn.titleLabel.font = FONT_16;
+    self.cancelBtn.titleLabel.font = FONT_18;
+
+    self.isNeedNewRecorder = YES;
+    self.soundManager = [SZYSoundManager sharedManager];
+    [self.view addSubview:self.soundWaveView];
+    self.soundWaveView.hidden = YES;
     
 }
 
@@ -60,124 +86,123 @@
     CGFloat viewH = self.view.bounds.size.height;
     
     //渲染界面
-    self.topViewHeightConstrsint.constant = viewH*0.6;
-    self.bottomViewHeightConstrsint.constant = viewH*0.4;
+    self.topViewHeightConstrsint.constant    = viewH * 0.6;
+    self.bottomViewHeightConstrsint.constant = viewH * 0.4;
 
-    self.recordBtnWidthConstrsint.constant = viewW*0.4;
-    self.recordBtnHeightConstrsint.constant = viewW*0.4;
-    
-    self.playBtnWidthConstrsint.constant = viewW*0.08;
-    self.playBtnHeightConstrsint.constant = viewW*0.08;
+    self.recordBtnWidthConstrsint.constant   = viewW * 0.4;
+    self.recordBtnHeightConstrsint.constant  = viewW * 0.4;
+
+    self.playBtnWidthConstrsint.constant     = viewW * 0.16;
+    self.playBtnHeightConstrsint.constant    = viewW * 0.07;
 //    self.playBtnLeftConstrsint.constant = viewW*0.15;
-    
-    self.doneBtnWidthConstrsint.constant = 0.16*viewW;
-    self.doneBtnHeightConstrsint.constant = 0.07*viewH;
+
+    self.doneBtnWidthConstrsint.constant     = 0.16 * viewW;
+    self.doneBtnHeightConstrsint.constant    = 0.07 * viewH;
 //    self.doneBtnRightConstrsint.constant = viewW*0.15;
-    
-    self.timeLabelWidthConstrsint.constant = 0.4*viewW;
-    self.timeLabelHeightConstrsint.constant = 0.07*viewH;
-    self.timeLabelTopConstrsint.constant = 0.02*viewH;
 
+    self.timeLabelWidthConstrsint.constant   = 0.4 * viewW;
+    self.timeLabelHeightConstrsint.constant  = 0.07 * viewH;
+    self.timeLabelTopConstrsint.constant     = 0.02 * viewH;
+
+    //强制重新布局子控件
     [self.view layoutIfNeeded];
-
+    
 }
 
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    
+    [self stopUpdatingMeter];
+}
+
+
+#pragma mark - 响应事件
 
 - (IBAction)doneAction:(id)sender {
     
-    //停止录音
-    [self.audioRecorder stop];
-    self.timer.fireDate=[NSDate distantFuture];
-    self.audioPower.progress=0.0;
-    //代理传值
-    [self.delegate haveCompleteRecord:[self.currentNote videoPath]];
+    //停止录音并保存
+    [self.soundManager stopAndSaveRecording];
+    //通知代理
+    [self.delegate haveCompleteRecordAtTime:self.startRecordTime];
+    //直接返回详情页
     [self dismissViewControllerAnimated:YES completion:nil];
-    
 }
+
 - (IBAction)startAction:(id)sender {
-    
     UIButton *btn = (UIButton *)sender;
-    btn.selected = !btn.selected;
-    
-    if (![self.audioRecorder isRecording]) {
-        [self.audioRecorder record]; //首次使用应用时如果调用record方法会询问用户是否允许使用麦克风
-        self.timer.fireDate=[NSDate distantPast];
+    if (self.isNeedNewRecorder) { //第一次点击，触发“开始录音”的动作
+        //开始录音
+        self.startRecordTime = [NSDate szyTimeStamp];
+        [self.soundManager startRecordingAudioWithFilePath:[self.currentNote videoPath] shouldStopAtSecond:0 andBlock:^(NSString *elapsedTime, NSError *error) {
+            
+            self.timeLabel.text = elapsedTime;
+        }];
+        //更新声波
+        [self startUpdatingMeter];
+        
+        self.isNeedNewRecorder = NO;
+        //重置按钮可用（默认是不可用的）
+        self.clearbtn.enabled = YES;
+        
+    }else{
+        if (btn.selected) { //点击了“暂停”
+            [self.soundManager pauseRecording];
+        }else{ //点击了“开始”
+            [self.soundManager resumeRecording];
+        }
     }
-    
+    btn.selected = !btn.selected;
 }
 
 - (IBAction)cancelAction:(id)sender {
-    
+    [self stopAudioServiceAndDeleteFileWithDirClear:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)stopAction:(id)sender {
-    
-    if ([self.audioRecorder isRecording]) {
-        [self.audioRecorder pause];
-        self.timer.fireDate=[NSDate distantFuture];
-    }
+- (IBAction)clearAction:(id)sender {
+    [self stopAudioServiceAndDeleteFileWithDirClear:NO];
+    self.isNeedNewRecorder = YES;
+    self.timeLabel.text = @"00:00";
 }
 
-//更新记录声音的强度
--(void)audioPowerChange{
-    
-    [self.audioRecorder updateMeters];//更新测量值
-    float power= [self.audioRecorder averagePowerForChannel:0];//取得第一个通道的音频，注意音频强度范围时-160到0
-    CGFloat progress=(1.0/160.0)*(power+160.0);
-    [self.audioPower setProgress:progress];
-    
+- (void)updateMeters{
+    if (self.soundWaveView.hidden) self.soundWaveView.hidden = NO;
+    [self.soundWaveView updateWithLevel:[self.soundManager updateMeters]];
 }
 
 #pragma mark - 私有方法
--(void)setAudioSession{
-    
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory:AVAudioSessionCategoryRecord error:nil];
-    [audioSession setActive:YES error:nil];
+-(void)stopAudioServiceAndDeleteFileWithDirClear:(BOOL)isClear{
+    /*
+     注意：这个接口之所以会保存录音文件，是因为在底层调用stop函数后，录音文件自动会保存，需要根据实际情况清除本地录音文件
+     */
+    [self.soundManager stopAndSaveRecording];
+    [self.currentNote deleteVideoAtLocalWithDirClear:isClear];
 }
-//录音文件设置
--(NSDictionary *)getAudioSetting{
-    NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
-    //设置录音格式
-    [dicM setObject:@(kAudioFormatLinearPCM) forKey:AVFormatIDKey];
-    //设置录音采样率，8000是电话采样率，对于一般录音已经够了
-    [dicM setObject:@(8000) forKey:AVSampleRateKey];
-    //设置通道,这里采用单声道
-    [dicM setObject:@(1) forKey:AVNumberOfChannelsKey];
-    //每个采样点位数,分为8、16、24、32
-    [dicM setObject:@(8) forKey:AVLinearPCMBitDepthKey];
-    //是否使用浮点数采样
-    [dicM setObject:@(YES) forKey:AVLinearPCMIsFloatKey];
-    return dicM;
+
+
+
+-(void)startUpdatingMeter{
+    
+    //CADisplayLink是一个能让我们以和屏幕刷新率同步的频率将特定的内容画到屏幕上的定时器类
+    [self.meterUpdateDisplayLink invalidate];
+    self.meterUpdateDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateMeters)];
+    [self.meterUpdateDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+  
+}
+
+-(void)stopUpdatingMeter{
+    
+    [self.meterUpdateDisplayLink invalidate];
+    self.meterUpdateDisplayLink = nil;
 }
 
 #pragma mark - getters
 
--(AVAudioRecorder *)audioRecorder{
-    if (!_audioRecorder){
-        //录音本地存储路径
-        NSURL *url = [NSURL fileURLWithPath:[self.currentNote videoPath]];
-        //创建录音格式设置
-        NSDictionary *setting=[self getAudioSetting];
-        //创建录音机
-        NSError *error=nil;
-        _audioRecorder=[[AVAudioRecorder alloc]initWithURL:url settings:setting error:&error];
-        _audioRecorder.meteringEnabled=YES;  //如果要监控声波则必须设置为YES
-        if (error) {
-            NSLog(@"创建录音机对象时发生错误，错误信息：%@",error.localizedDescription);
-            return nil;
-        }
+-(SZYSoundWaveView *)soundWaveView{
+    if (!_soundWaveView){
+        _soundWaveView = [[SZYSoundWaveView alloc]initWithFrame:CGRectMake(0, 150, UIScreenWidth, 100)];
     }
-    return _audioRecorder;
+    return _soundWaveView;
 }
-
--(NSTimer *)timer{
-    if (!_timer){
-        _timer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(audioPowerChange) userInfo:nil repeats:YES];
-    }
-    return _timer;
-}
-
 
 @end

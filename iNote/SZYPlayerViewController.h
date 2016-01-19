@@ -10,6 +10,7 @@
 
 @interface SZYPlayerViewController : UIViewController
 
-@property (nonatomic, strong) NSString *videoPath;
+//数据源方法－设置音频文件地址
+-(void)setLocalAudioFilePath:(NSString *)audioPath;
 
 @end

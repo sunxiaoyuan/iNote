@@ -7,9 +7,7 @@
 //
 
 #import "SZYFavoriteViewController.h"
-#import "SZYNoteLocalManager.h"
 #import "SZYNoteModel.h"
-#import "SZYLocalManagerFactory.h"
 #import "SZYSolidaterFactory.h"
 #import "SZYNoteFrameInfo.h"
 #import "SZYNoteDisplayCell.h"
@@ -27,7 +25,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"收藏";
     [self.view setBackgroundColor:[UIColor whiteColor]];
     [self.view addSubview:self.tableView];
     
@@ -54,24 +51,24 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    SZYNoteFrameInfo *info = [[SZYNoteFrameInfo alloc]initWithNote:self.noteListArr[indexPath.row]];
-    return info.cellHeight;
+//    SZYNoteFrameInfo *info = [[SZYNoteFrameInfo alloc]initWithNote:self.noteListArr[indexPath.row]];
+    return 44;
     
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    static NSString *cellID = @"NoteDisplayCell";
-    SZYBaseCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
-    if (!cell) {
-        cell = [SZYNoteDisplayCell loadFromXib];
-        cell.backgroundColor = [UIColor whiteColor];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    }
-    SZYNoteModel *note = self.noteListArr[indexPath.row];
-    SZYNoteFrameInfo *info = [[SZYNoteFrameInfo alloc]initWithNote:note];
-    [cell setNote:note FrameInfo:info];
-    return cell;
+//    static NSString *cellID = @"NoteDisplayCell";
+//    SZYBaseCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+//    if (!cell) {
+//        cell = [SZYNoteDisplayCell loadFromXib];
+//        cell.backgroundColor = [UIColor whiteColor];
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//    }
+//    SZYNoteModel *note = self.noteListArr[indexPath.row];
+//    SZYNoteFrameInfo *info = [[SZYNoteFrameInfo alloc]initWithNote:note];
+//    [cell setNote:note FrameInfo:info IndexPath:indexPath];
+    return nil;
     
 }
 
@@ -89,11 +86,17 @@
     if (!self.noteListArr) {
         self.noteListArr = [NSMutableArray array];
     }
-    SZYNoteLocalManager *noteLM = (SZYNoteLocalManager *)[SZYLocalManagerFactory managerFactoryWithType:kNoteType];
-    noteLM.solidater = [SZYSolidaterFactory solidaterFctoryWithType:kNoteType];
-    //查询数据库
-    self.noteListArr = [noteLM notesWithFavorite];
     
+    SZYNoteSolidater *solidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
+    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+        //查询数据库
+        NSString *criteria = @"WHERE isFavorite = ?";
+        [solidater readByCriteria:criteria queryValue:@"YES" successHandler:^(id result) {
+            self.noteListArr = (NSMutableArray *)result;
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"%@",errorMsg);
+        }];
+    }];
     [self.tableView reloadData];
     
 }

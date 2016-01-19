@@ -29,17 +29,26 @@
 
 @end
 
-@implementation SZYMainViewController
+@implementation SZYMainViewController{
+    //手指移动距离
+    CGFloat moveX;
+    //缩放的最终比例
+    CGFloat zoomScale;
+    //X最终偏移距离
+    CGFloat maxMoveX;
+    
+    CGFloat scaleXY;
+}
 
 #pragma mark - 生命事件
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     //添加子控制器
-    SZYHomeViewController *homeVC = [[SZYHomeViewController alloc]init];
-    SZYNotesViewController *notesVC = [[SZYNotesViewController alloc]init];
-    SZYFavoriteViewController *favVC = [[SZYFavoriteViewController alloc]init];
-    SZYSettingViewController *setVC = [[SZYSettingViewController alloc]init];
+    SZYHomeViewController *homeVC = [[SZYHomeViewController alloc]initWithTitle:@"首页" BackButton:NO];
+    SZYNotesViewController *notesVC = [[SZYNotesViewController alloc]initWithTitle:@"笔记本" BackButton:NO];
+    SZYFavoriteViewController *favVC = [[SZYFavoriteViewController alloc]initWithTitle:@"收藏" BackButton:NO];
+    SZYSettingViewController *setVC = [[SZYSettingViewController alloc]initWithTitle:@"设置" BackButton:NO];
     SZYLgoinViewController *logVC = [[SZYLgoinViewController alloc] initWithTitle:@"登录" BackButton:NO];
     NSArray *vcArr = @[homeVC,notesVC,favVC,setVC,logVC];
     
@@ -112,95 +121,84 @@
     [self.showViewController recoverInterface];
 }
 
-#pragma mark - 私有方法
+#pragma mark - 响应方法
 
 -(void)panGesture:(UIPanGestureRecognizer *)pan{
     
     //手指移动距离
-    CGFloat moveX = [pan translationInView:self.view].x;
+    moveX = [pan translationInView:self.view].x;
     //缩放的最终比例
-    CGFloat zoomScale = (UIScreenHeight - SZYScaleTopMargin * 2)/UIScreenHeight;
+    zoomScale = (UIScreenHeight - SZYScaleTopMargin * 2)/UIScreenHeight;
     //X最终偏移距离
-    CGFloat maxMoveX = UIScreenWidth - UIScreenWidth * SZYZoomScaleRight;
+    maxMoveX = UIScreenWidth - UIScreenWidth * SZYZoomScaleRight;
+    //界面动画
+    [self interfaceAnimationTouchedMake];
+    if (pan.state == UIGestureRecognizerStateEnded) {
+        [self interfaceAnimationUntouchedMake:pan];
+    }
+}
+
+#pragma mark - 私有方法
+
+-(void)interfaceAnimationTouchedMake{
     //没有缩放时，允许缩放
-    if (self.showViewController.isScale == NO) {
-        if ( moveX >= 0 && moveX <= maxMoveX + 5 ){
-            //获取X偏移下, XY缩放的比例
-            CGFloat scaleXY = 1 - moveX / maxMoveX * SZYZoomScaleRight;
+    if (!self.showViewController.isScale) {
+        
+        if ( moveX >= 0 && moveX <= maxMoveX + 5 ){//为了添加弹性效果，＋5
+            //获取当前X偏移下, XY缩放的比例
+            scaleXY = 1 - moveX / maxMoveX * SZYZoomScaleRight;
+            //随着手指移动坐动画，此时手指还未放开
             CGAffineTransform transform = CGAffineTransformMakeScale(scaleXY, scaleXY);
             self.showViewController.navigationController.view.transform = CGAffineTransformTranslate(transform, moveX / scaleXY, 0);
         }
-        //当手势停止的时候,判断X轴的移动距离，停靠
-        if (pan.state == UIGestureRecognizerStateEnded){
-            //计算剩余停靠时间
-            if (moveX >= maxMoveX / 2){ //X轴移动超过一半
-                CGFloat duration = 0.5 * (maxMoveX - moveX)/maxMoveX > 0 ? 0.5 * (maxMoveX - moveX)/maxMoveX : -(0.5 * (maxMoveX - moveX)/maxMoveX);
-                if (duration <= 0.1) duration = 0.1;
-                //直接停靠到停止的位置
-                [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
-                    
-                    CGAffineTransform tt = CGAffineTransformMakeScale(zoomScale, zoomScale);
-                    self.showViewController.navigationController.view.transform = CGAffineTransformTranslate(tt, maxMoveX , 0);
-                    
-                } completion:^(BOOL finished) {
-                    //将状态改为已经缩放
-                    self.showViewController.isScale = YES;
-                    //手动点击按钮添加遮盖
-                    [self.showViewController leftMenuClick];
-                }];
-                
-            }else{
-                //X轴移动不够一半 回到原位,不是缩放状态
-                [UIView animateWithDuration:0.2 animations:^{
-                    
-                    self.showViewController.navigationController.view.transform = CGAffineTransformIdentity;
-                    
-                } completion:^(BOOL finished) {
-                    self.showViewController.isScale = NO;
-                }];
-            }
-        }
         
-    }else if (self.showViewController.isScale == YES){
+    }else{
         
         //在已经缩放的情况下，计算比例
-        CGFloat scaleXY = zoomScale - moveX / maxMoveX * SZYZoomScaleRight;
+        scaleXY = zoomScale - moveX / maxMoveX * SZYZoomScaleRight;
         if (moveX <= 5) {
             CGAffineTransform transform = CGAffineTransformMakeScale(scaleXY, scaleXY);
             self.showViewController.navigationController.view.transform = CGAffineTransformTranslate(transform, (moveX + maxMoveX), 0);
         }
-        //当手势停止的时候,判断X轴的移动距离，停靠
-        if (pan.state == UIGestureRecognizerStateEnded) {
-            //计算剩余停靠时间
-            if (-moveX >= maxMoveX / 2) {
-                CGFloat duration = 0.5 * (maxMoveX + moveX)/maxMoveX > 0 ? 0.5 * (maxMoveX + moveX)/maxMoveX : -(0.5 * (maxMoveX + moveX)/maxMoveX);
-                if (duration <= 0.1) duration = 0.1;
-                //直接停靠到停止的位置
-                [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
-                    
-                    self.showViewController.navigationController.view.transform = CGAffineTransformIdentity;
-                    
-                } completion:^(BOOL finished) {
-                    
-                    //将状态改为已经缩放
-                    self.showViewController.isScale = NO;
-                    //手动点击按钮添加遮盖
-                    [self.showViewController recoverInterface];
-                }];
-                
-            } else {//X轴移动不够一半 回到原位,不是缩放状态
-                
-                [UIView animateWithDuration:0.2 animations:^{
-                    
-                    CGAffineTransform tt = CGAffineTransformMakeScale(zoomScale, zoomScale);
-                    self.showViewController.navigationController.view.transform = CGAffineTransformTranslate(tt, maxMoveX, 0);
-                    
-                } completion:^(BOOL finished) {
-                    self.showViewController.isScale = YES;
-                }];
-            }
-        }
     }
+}
+
+-(void)interfaceAnimationUntouchedMake:(UIPanGestureRecognizer *)pan{
+    
+    if (fabs(moveX) >= maxMoveX / 2) {
+        
+        [UIView animateWithDuration:[self bestAnimationTimeInterval] delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+            
+            self.showViewController.navigationController.view.transform =  self.showViewController.isScale ? CGAffineTransformIdentity : CGAffineTransformTranslate(CGAffineTransformMakeScale(zoomScale, zoomScale), maxMoveX , 0);
+            
+        } completion:^(BOOL finished) {
+
+            if (self.showViewController.isScale) {
+                //手动点击按钮添加遮盖
+                [self.showViewController removeHub];
+            }else{
+                //添加遮盖
+                [self.showViewController addHub];
+            }
+            self.showViewController.isScale = !self.showViewController.isScale;
+            
+        }];
+        
+    }else{
+        
+        [UIView animateWithDuration:0.2 animations:^{
+            
+            self.showViewController.navigationController.view.transform = self.showViewController.isScale ?
+                CGAffineTransformTranslate(CGAffineTransformMakeScale(zoomScale, zoomScale), maxMoveX, 0) :CGAffineTransformIdentity;
+        }];
+    }
+}
+
+-(NSTimeInterval)bestAnimationTimeInterval{
+    //计算最佳动画时间
+    NSTimeInterval duration =  fabs(0.5 * (maxMoveX - fabs(moveX)) / maxMoveX);
+    if (duration <= 0.1) duration = 0.1;
+    return duration;
 }
 
 
@@ -229,6 +227,5 @@
     }
     return _pan;
 }
-
 
 @end
