@@ -114,10 +114,6 @@
         }
         success(tempArr);
     } failureHandler:failure];
-<<<<<<< HEAD
-=======
-    
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 }
 
 -(void)deleteByCriteria:(NSString *)criteria deleteValue:(id)deleteValue successHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure{

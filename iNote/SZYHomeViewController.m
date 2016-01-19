@@ -104,16 +104,12 @@
     
     self.selectedNoteBookIndex = selectedIndex;
     //如果选中全部，需要更新行数
-<<<<<<< HEAD
-    if (_selectedNoteBookIndex == 0) self.numberOfRows = [self allNoteNumber];
-=======
+
     if (_selectedNoteBookIndex == 0){
         self.numberOfRows = [self allNoteNumber];
     }else{
         self.numberOfRows = [self.noteBookArr[_selectedNoteBookIndex - 1] noteList].count;
     }
-    
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     [self.tableView reloadData];
 }
 
@@ -283,17 +279,6 @@
         view.backgroundColor = [UIColor clearColor];
         
         //普通header
-<<<<<<< HEAD
-//            MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
-//            //设置状态栏
-//            header.stateLabel.hidden = NO;
-//            header.stateLabel.font = FONT_11;
-//            header.stateLabel.textColor = UIColorFromRGB(0xdcdcdc);
-//            //设置时间栏
-//            header.lastUpdatedTimeLabel.hidden = YES;
-//            header.lastUpdatedTimeLabel.font = FONT_11;
-//            header.lastUpdatedTimeLabel.textColor = UIColorFromRGB(0xdcdcdc);
-=======
 //        MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
 //        //设置状态栏
 //        header.stateLabel.hidden = NO;
@@ -303,7 +288,6 @@
 //        header.lastUpdatedTimeLabel.hidden = YES;
 //        header.lastUpdatedTimeLabel.font = FONT_11;
 //        header.lastUpdatedTimeLabel.textColor = UIColorFromRGB(0xdcdcdc);
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
         
         //动态GIFheader
         SZYRefreshHeader *header = [SZYRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];

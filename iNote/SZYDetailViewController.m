@@ -58,13 +58,9 @@
 @property (nonatomic, strong) UIImageView       *myImageView;
 //slider底层图层
 @property (nonatomic, strong) UIView            *optionView;
-<<<<<<< HEAD
-
-=======
 
 
-@property (nonatomic, assign) BOOL                    isMenuOpen;
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
+
 @property (nonatomic, strong) SZYNoteModel            *currentNote;
 @property (nonatomic, assign) BOOL                    isCamera;
 @property (nonatomic, strong) UIImagePickerController *imagePickerVC;
@@ -101,10 +97,7 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor whiteColor];
-<<<<<<< HEAD
-=======
-    self.isMenuOpen = NO;
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
+
     self.latestTextViewFrame = CGRectZero;
     //加载工具
     self.solidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
@@ -160,11 +153,8 @@
     //工具栏
     self.toolView.frame = CGRectMake(0, UIScreenHeight-SIZ(40), UIScreenWidth, SIZ(40));
     //菜单栏
-<<<<<<< HEAD
     self.menuView.frame = CGRectMake(UIScreenWidth-SIZ(100), self.naviView.bottom - SIZ(60), SIZ(100), SIZ(60));
-=======
     self.menuView.frame = CGRectMake(UIScreenWidth-SIZ(100), 0, SIZ(100), SIZ(60));
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     //标题输入框
     self.titleTextField.frame = CGRectMake(kLeadingSpacing, CGRectGetMaxY(self.naviView.frame)+SIZ(5),UIScreenWidth-2*kLeadingSpacing-kNoteBookIconWidth-SIZ(5), SIZ(30));
     //选择笔记本按钮
@@ -176,20 +166,8 @@
     self.bgScrollView.frame = CGRectMake(kLeadingSpacing, self.sepLine.bottom+SIZ(5), UIScreenWidth-2*kLeadingSpacing, bgScrollViewH);
     
     if (self.latestTextViewFrame.size.width == 0) { //首次进入这一页，textview初始尺寸
-<<<<<<< HEAD
         //给一个初始高度
         self.textView.frame = CGRectMake(-SIZ(2), 0, self.bgScrollView.width+SIZ(4), SIZ(30));
-=======
-        
-        CGFloat textViewH = [self.textView resize].height;
-        if (textViewH > 0) {
-            self.textView.frame = CGRectMake(-SIZ(2), 0, self.bgScrollView.width+SIZ(4), textViewH);
-        }else{
-            //给一个初始高度
-            self.textView.frame = CGRectMake(-SIZ(2), 0, self.bgScrollView.width+SIZ(4), SIZ(30));
-        }
-        
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     }else{
         self.textView.frame = self.latestTextViewFrame;
     }
@@ -278,21 +256,14 @@
                             [self.currentNote deleteImageAtLocal:^(NSError *error) {
                                 if (error){
                                     NSLog(@"delete image error = %@",error);
-<<<<<<< HEAD
                                 }else{
                                     [self.currentNote deleteVideoAtLocalWithDirClear:YES];
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
                                 }
                             }];
                         }else{
                             NSLog(@"delete content error = %@",error);
                         }
                     }];
-<<<<<<< HEAD
-=======
-                    
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
                 } failureHandler:^(NSString *errorMsg) {
                     NSLog(@"error = %@",errorMsg);
                 }];
@@ -415,21 +386,6 @@
     return YES;
 }
 
-<<<<<<< HEAD
-=======
-//- (void)textFieldDidEndEditing:(UITextField *)textField{
-//    if ([textField.text isEqualToString:@""]) {
-//        textField.text = kDefaultTitle;
-//    }
-//}
-
-#pragma mark - UITextViewDelegate
-
-- (void)textViewDidBeginEditing:(UITextView *)textView{
-    [self enterEditingState];
-}
-
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 #pragma mark - SZYDetailNaviViewDelegate
 
 -(void)customNaviViewLeftMenuClick:(UIButton *)sender{
@@ -457,7 +413,6 @@
         [self showMenu:YES];
         
     }
-<<<<<<< HEAD
     sender.selected = !sender.selected;
 }
 
@@ -467,9 +422,6 @@
         self.menuView.transform = isNeedShow ? CGAffineTransformMakeTranslation(0, SIZ(60)) : CGAffineTransformIdentity;
 
     }];
-=======
-    self.isMenuOpen = !self.isMenuOpen;
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 }
 
 //完成编辑后，点击右上角“完成”的响应事件
@@ -484,7 +436,6 @@
     }else{
         self.currentNote.noteBook_id_belonged = self.belongedNoteBook.noteBook_id;
     }
-<<<<<<< HEAD
     if ([self.titleTextField.text isEqualToString:@""]) {
         self.currentNote.title = kDefaultTitle;
     }else{
@@ -494,15 +445,7 @@
     [self.currentNote saveImage:self.tempImage];
     [self.currentNote saveContent:self.textView.text];
     self.currentNote.isFavorite = self.isFavorite ? @"YES" : @"NO";
-=======
-    if ([self.titleTextField.text isEqualToString:@""]) self.titleTextField.text = kDefaultTitle;
-    self.currentNote.title = self.titleTextField.text;
-    self.currentNote.mendTime = [NSDate szyTimeStamp];
-    [self.currentNote saveImage:self.tempImage];
-    [self.currentNote saveContent:self.textView.text];
-    self.isFavorite ? (self.currentNote.isFavorite = @"YES") : (self.currentNote.isFavorite = @"NO");
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
-    
+
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
         
         [_solidater readOneByID:self.currentNote.note_id successHandler:^(id result) {
@@ -538,34 +481,17 @@
     switch (sender.tag) {
         case 101: //点击收藏
         {
-<<<<<<< HEAD
             self.currentNote.isFavorite = sender.selected?@"YES":@"NO";
             [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
                 [self.solidater updateOne:self.currentNote successHandler:^(id result) {
                     //收起菜单栏
                     [self showMenu:NO];
-=======
-            if (self.isFavorite) {
-                [sender setTitle:@"收 藏" forState:UIControlStateNormal];
-            }else{
-                [sender setTitle:@"已收藏" forState:UIControlStateNormal];
-            }
-            self.isFavorite = !self.isFavorite;
-            self.currentNote.isFavorite = self.isFavorite?@"YES":@"NO";
-   
-            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-                //刷新数据库
-                [_solidater updateOne:self.currentNote successHandler:^(id result) {
-                    //success
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
+
                 } failureHandler:^(NSString *errorMsg) {
                     NSLog(@"%@",errorMsg);
                 }];
             }];
-<<<<<<< HEAD
             sender.selected = !sender.selected;
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
         }
             break;
         case 102: //点击删除
@@ -620,13 +546,6 @@
         [self.optionView removeFromSuperview];
         self.optionView = nil;
     }
-<<<<<<< HEAD
-=======
-}
--(void)sliderValueChanged:(UISlider *)slider{
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TextViewFontNotification" object:@(slider.value)];
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 }
 
 -(void)hideKeyBoardClick{
@@ -638,10 +557,6 @@
 
 //获得选择的笔记本对象
 -(void)didChooseNoteBook:(SZYNoteBookModel *)noteBookSelected{
-<<<<<<< HEAD
-=======
-    //在更新当前笔记的noteBook_id之前首先判断，是否需要进入编辑模式
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     if (![self.currentNote.noteBook_id_belonged isEqualToString:noteBookSelected.noteBook_id]) {
         [self enterEditingState];
     }
@@ -661,7 +576,6 @@
         [self.view addSubview:self.showVideoBtn];
         //进入编辑模式
         [self enterEditingState];
-<<<<<<< HEAD
     }
 }
 
@@ -685,78 +599,6 @@
     //记录最新的尺寸
     self.latestTextViewFrame = self.textView.frame;
     
-=======
-    }
-}
-
--(void)showVideoBtnClick:(UIButton *)btn{
-    
-    btn.selected = !btn.selected;
-    if (btn.selected) {
-        //展示录音信息面板
-        [self.view insertSubview:self.videoInfoView belowSubview:self.showVideoBtn];
-        //从左边移动进入
-        [self showVideoInfoPad];
-  
-    }else{
-        //收起面板
-        [self hideVideoInfoPad];
-    }
-}
-
--(void)showVideoInfoPad{
-    
-    [UIView animateWithDuration:kVideoInfoAnimatedDuration animations:^{
-        self.videoInfoView.transform = CGAffineTransformMakeTranslation(UIScreenWidth, 0);
-    }];
-}
-
--(void)hideVideoInfoPad{
-    
-    [UIView animateWithDuration:kVideoInfoAnimatedDuration animations:^{
-        self.videoInfoView.transform = CGAffineTransformIdentity;
-    }];
-}
-
--(void)deleteVideo:(UIButton *)btn{
-    
-    [UIAlertController showAlertAtViewController:self withMessage:@"正在执行删除录音操作，您确定继续执行吗？" cancelTitle:@"取消" confirmTitle:@"删除" cancelHandler:^(UIAlertAction *action){
-        //do nothing
-    } confirmHandler:^(UIAlertAction *action){
-        //收起面板
-        [self hideVideoInfoPad];
-        [self.videoInfoView removeFromSuperview];
-        self.videoInfoView = nil;
-        [self.showVideoBtn removeFromSuperview];
-        self.showVideoBtn = nil;
-        //清空本地文件
-        [self.currentNote deleteVideoAtLocalWithDirClear:YES];
-        //进入编辑状态
-        [self enterEditingState];
-    }];
-}
-
-#pragma mark - 响应事件
-
--(void)textDidChanged:(NSNotification *)noti{
-    [self enterEditingState];
-    [self refreshInterface];
-}
-
--(void)fontDidChanged:(NSNotification *)noti{
-    self.textView.font = [UIFont systemFontOfSize:[noti.object floatValue]];
-    [self refreshInterface];
-}
-
--(void)refreshInterface{
-    //加入动态计算高度
-    CGSize size = [self.textView resize];
-    CGFloat deltaY = size.height - self.textView.height;
-    self.textView.height = size.height;
-    //记录最新的尺寸
-    self.latestTextViewFrame = self.textView.frame;
-    
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     //改变下方的图片位置
     self.myImageView.top += deltaY;
     //改变底层滚动视图滚动范围
@@ -813,7 +655,6 @@
         [self adaptViewLocation];
 
     }];
-<<<<<<< HEAD
 }
 
 -(void)adaptViewLocation{
@@ -832,21 +673,6 @@
 -(void)sliderValueChanged:(UISlider *)slider{
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"TextViewFontNotification" object:@(slider.value)];
-=======
-}
-
--(void)adaptViewLocation{
-    if (self.optionView) self.optionView.top = self.toolView.top - SIZ(44);
-    if (self.showVideoBtn) self.showVideoBtn.top = self.toolView.top - 32;
-    if (self.videoInfoView && self.showVideoBtn) self.videoInfoView.top = self.showVideoBtn.top - 8;
-}
-
-
--(void)lazyLoadImageView:(UIImage *)showImage{
-    
-    [self.bgScrollView addSubview:self.myImageView];
-    self.myImageView.image = showImage;
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 }
 
 - (void)removeView {
@@ -872,7 +698,6 @@
     [self.browser show];
 }
 
-<<<<<<< HEAD
 -(void)showVideoBtnClick:(UIButton *)btn{
     
     btn.selected = !btn.selected;
@@ -920,8 +745,6 @@
     }];
 }
 
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 -(void)jumpToVideoPlayer{
 
     //模态跳转播放界面
@@ -1048,10 +871,7 @@
     return _showVideoBtn;
 }
 
-<<<<<<< HEAD
 //录音文件信息界面
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 -(UIView *)videoInfoView{
     if (!_videoInfoView){
         //底层面板
@@ -1078,11 +898,7 @@
     }
     return _videoInfoView;
 }
-<<<<<<< HEAD
 //调节字体面板
-=======
-
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 -(UIView *)optionView{
     if (!_optionView){
         _optionView = [[UIView alloc]initWithFrame:CGRectMake(0, self.toolView.top - SIZ(44), UIScreenWidth, SIZ(44))];

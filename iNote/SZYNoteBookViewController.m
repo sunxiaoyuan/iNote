@@ -18,37 +18,20 @@
 #import "SZYDetailViewController.h"
 
 @interface SZYNoteBookViewController ()<UITableViewDelegate,UITableViewDataSource,SZYNoteDisplayCellDelegate>
-<<<<<<< HEAD
 
-@property (nonatomic, strong) UIImageView *bgImageView;//表格下面的背景图片
-@property (nonatomic, strong) UITableView *tableView;//数据表格
-@property (nonatomic, strong) NSMutableArray      *noteArr;//笔记本的列表
-@property (nonatomic, strong) NSMutableDictionary *cellStateDict;
-@property (nonatomic, strong) SZYNoteSolidater *noteSolidater;
-=======
 @property (nonatomic, strong) UITableView         *tableView;//数据表格
 @property (nonatomic, strong) NSMutableArray      *noteArr;//笔记本的列表
 @property (nonatomic, strong) NSMutableDictionary *cellStateDict;
 @property (nonatomic, strong) SZYNoteSolidater    *noteSolidater;
 
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 @end
 
 @implementation SZYNoteBookViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-<<<<<<< HEAD
-    //隐藏导航栏
-//    [self.navigationController setNavigationBarHidden:YES animated:YES];
 
     self.view.backgroundColor = [UIColor whiteColor];
-//    [self.view addSubview:self.bgImageView];
-=======
-
-    self.view.backgroundColor = [UIColor whiteColor];
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     [self.view addSubview:self.tableView];
     
     self.noteSolidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
@@ -59,10 +42,7 @@
     [super viewWillAppear:animated];
 
     [self loadData];
-<<<<<<< HEAD
-//    self.bgImageView.frame = CGRectMake(0,0,UIScreenWidth,UIScreenHeight);
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
+
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
 
@@ -149,18 +129,4 @@
     return _tableView;
 }
 
-<<<<<<< HEAD
-//-(UIImageView *)bgImageView{
-//    if (!_bgImageView){
-//        _bgImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bgImage"]];
-//        _bgImageView.layer.masksToBounds = YES;
-//        _bgImageView.layer.cornerRadius = 8.0;
-//        _bgImageView.layer.borderWidth = 1.0;
-//        _bgImageView.layer.borderColor = [ThemeColor CGColor];
-//    }
-//    return _bgImageView;
-//}
-
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 @end

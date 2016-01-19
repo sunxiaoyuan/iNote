@@ -152,33 +152,15 @@
         }
     }
     btn.selected = !btn.selected;
-<<<<<<< HEAD
 }
 
 - (IBAction)cancelAction:(id)sender {
     [self stopAudioServiceAndDeleteFileWithDirClear:YES];
-=======
-    
-}
-
-- (IBAction)cancelAction:(id)sender {
-    
-    [self.currentNote deleteVideoAtLocalWithDirClear:YES];
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (IBAction)clearAction:(id)sender {
-<<<<<<< HEAD
     [self stopAudioServiceAndDeleteFileWithDirClear:NO];
-=======
-    /*
-     注意：这个接口之所以会保存录音文件，是因为在底层调用stop函数后，录音文件自动会保存，需要根据实际情况清除本地录音文件
-     */
-    [self.soundManager stopAndSaveRecording];
-    //清除本地文件,但暂时保存目录
-    [self.currentNote deleteVideoAtLocalWithDirClear:NO];
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
     self.isNeedNewRecorder = YES;
     self.timeLabel.text = @"00:00";
 }
@@ -189,7 +171,6 @@
 }
 
 #pragma mark - 私有方法
-<<<<<<< HEAD
 -(void)stopAudioServiceAndDeleteFileWithDirClear:(BOOL)isClear{
     /*
      注意：这个接口之所以会保存录音文件，是因为在底层调用stop函数后，录音文件自动会保存，需要根据实际情况清除本地录音文件
@@ -198,10 +179,6 @@
     [self.currentNote deleteVideoAtLocalWithDirClear:isClear];
 }
 
-
-
-=======
->>>>>>> f7cbcbc74662aa001615a19c2b8048029e0fbb61
 -(void)startUpdatingMeter{
     
     //CADisplayLink是一个能让我们以和屏幕刷新率同步的频率将特定的内容画到屏幕上的定时器类
