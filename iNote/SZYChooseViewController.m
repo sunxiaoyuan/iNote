@@ -94,7 +94,7 @@
 
 #pragma mark - SZYDetailNaviViewDelegate
 
--(void)backBtnDidClick{
+-(void)customNaviViewLeftMenuClick:(UIButton *)sender{
     [self.navigationController popViewControllerAnimated:YES];
 }
 

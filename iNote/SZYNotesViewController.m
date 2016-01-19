@@ -11,8 +11,7 @@
 #import "SZYNoteBookModel.h"
 #import "SZYNoteBookCell.h"
 #import "SZYNoteBookViewController.h"
-#import "MJRefresh.h"
-#import "SZYRefreshHeader.h"
+
 
 @interface SZYNotesViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
@@ -31,7 +30,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
     //不需要系统自动处理顶部内容伸缩
     self.automaticallyAdjustsScrollViewInsets = NO;
     //设置底色
@@ -48,9 +46,8 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-
-    //设置下拉刷新
-    [self setHeadRefresh];
+    
+    [self loadData];
     
     self.addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
     self.sepLineView.frame = CGRectMake(0, 44, UIScreenWidth, 1);
@@ -68,7 +65,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 120;
+    return 100;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -77,11 +74,8 @@
     if (cell == nil) {
         cell = [[SZYNoteBookCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-
     }
-    SZYNoteBookModel *noteBook = _noteBookArr[indexPath.row];
-    cell.titleLabel.text = noteBook.title;
-    cell.subTitleLabel.text = [NSString stringWithFormat:@"(%lu个笔记)",(unsigned long)[noteBook.noteList count]];
+    cell.noteBook = _noteBookArr[indexPath.row];
     return cell;
 }
 
@@ -94,7 +88,6 @@
     [self.navigationController pushViewController:noteBookVC animated:YES];
     
 }
-
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -141,11 +134,7 @@
     }else{ //新建笔记本的alert
         if (buttonIndex == 1) {
             UITextField *tf = [alertView textFieldAtIndex:0];
-            SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]init];
-            newNoteBook.noteBook_id = [NSString stringOfUUID];
-            newNoteBook.user_id_belonged = ApplicationDelegate.userSession.user_id;
-            newNoteBook.title = tf.text;
-            newNoteBook.isPrivate = @"NO";
+            SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]initWithID:[NSString stringOfUUID] Title:tf.text UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
             [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
                 //插入一行笔记本数据
                 [_noteBookSolidater saveOne:newNoteBook successHandler:^(id result) {
@@ -160,18 +149,6 @@
 }
 
 #pragma mark - 私有方法
-
--(void)setHeadRefresh{
-    SZYRefreshHeader *header = [SZYRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
-    // 隐藏时间
-    header.lastUpdatedTimeLabel.hidden = YES;
-    // 隐藏状态
-    header.stateLabel.hidden = YES;
-    // 马上进入刷新状态
-    [header beginRefreshing];
-    // 设置header
-    self.tableView.header = header;
-}
 
 -(void)editBtnClick:(UIButton *)sender{
     
@@ -205,13 +182,11 @@
         self.noteBookArr = [NSMutableArray array];
     }
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-        [_noteBookSolidater readAllSuccessHandler:^(id result) {
+        //获取笔记本简介列表
+        [_noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
             self.noteBookArr = (NSMutableArray *)result;
-            //停止刷新
-            [self.tableView.header endRefreshing];
         } failureHandler:^(NSString *errorMsg) {
             NSLog(@"error = %@",errorMsg);
-
         }];
     }];
     [self.tableView reloadData];

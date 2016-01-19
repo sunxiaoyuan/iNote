@@ -437,7 +437,6 @@
         
     }
     self.isMenuOpen = !self.isMenuOpen;
- 
 }
 
 //完成编辑后，点击右上角“完成”的响应事件
@@ -579,6 +578,10 @@
 
 //获得选择的笔记本对象
 -(void)didChooseNoteBook:(SZYNoteBookModel *)noteBookSelected{
+    //在更新当前笔记的noteBook_id之前首先判断，是否需要进入编辑模式
+    if (![self.currentNote.noteBook_id_belonged isEqualToString:noteBookSelected.noteBook_id]) {
+        [self enterEditingState];
+    }
     //更新当前笔记的noteBook_id
     self.currentNote.noteBook_id_belonged = noteBookSelected.noteBook_id;
     //更新界面

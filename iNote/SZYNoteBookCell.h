@@ -8,9 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+@class SZYNoteBookModel;
+
+
+
 @interface SZYNoteBookCell : UITableViewCell
 
-@property (nonatomic, strong) UILabel     *titleLabel;
-@property (nonatomic, strong) UILabel     *subTitleLabel;
+@property (nonatomic, strong) SZYNoteBookModel *noteBook;
 
 @end

@@ -18,12 +18,11 @@
 #import "SZYDetailViewController.h"
 
 @interface SZYNoteBookViewController ()<UITableViewDelegate,UITableViewDataSource,SZYNoteDisplayCellDelegate>
-
-@property (nonatomic, strong) UIImageView *bgImageView;//表格下面的背景图片
-@property (nonatomic, strong) UITableView *tableView;//数据表格
+@property (nonatomic, strong) UITableView         *tableView;//数据表格
 @property (nonatomic, strong) NSMutableArray      *noteArr;//笔记本的列表
 @property (nonatomic, strong) NSMutableDictionary *cellStateDict;
-@property (nonatomic, strong) SZYNoteSolidater *noteSolidater;
+@property (nonatomic, strong) SZYNoteSolidater    *noteSolidater;
+
 @end
 
 @implementation SZYNoteBookViewController
@@ -31,11 +30,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //隐藏导航栏
-//    [self.navigationController setNavigationBarHidden:YES animated:YES];
 
     self.view.backgroundColor = [UIColor whiteColor];
-//    [self.view addSubview:self.bgImageView];
     [self.view addSubview:self.tableView];
     
     self.noteSolidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
@@ -46,7 +42,6 @@
     [super viewWillAppear:animated];
 
     [self loadData];
-//    self.bgImageView.frame = CGRectMake(0,0,UIScreenWidth,UIScreenHeight);
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
 
@@ -132,16 +127,5 @@
     }
     return _tableView;
 }
-
-//-(UIImageView *)bgImageView{
-//    if (!_bgImageView){
-//        _bgImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bgImage"]];
-//        _bgImageView.layer.masksToBounds = YES;
-//        _bgImageView.layer.cornerRadius = 8.0;
-//        _bgImageView.layer.borderWidth = 1.0;
-//        _bgImageView.layer.borderColor = [ThemeColor CGColor];
-//    }
-//    return _bgImageView;
-//}
 
 @end

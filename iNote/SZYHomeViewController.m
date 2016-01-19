@@ -104,7 +104,12 @@
     
     self.selectedNoteBookIndex = selectedIndex;
     //如果选中全部，需要更新行数
-    if (_selectedNoteBookIndex == 0) self.numberOfRows = [self allNoteNumber];
+    if (_selectedNoteBookIndex == 0){
+        self.numberOfRows = [self allNoteNumber];
+    }else{
+        self.numberOfRows = [self.noteBookArr[_selectedNoteBookIndex - 1] noteList].count;
+    }
+    
     [self.tableView reloadData];
 }
 
@@ -200,7 +205,6 @@
     [self.navigationController pushViewController:detailVC animated:YES];
 }
 
-
 -(void)loadData{
     
     //查询到所有笔记本信息
@@ -225,6 +229,7 @@
     [noteBookList saveStateWithKey:kNoteBookListSnapShot];
     
     //初始化配置数据
+    //默认加载"全部笔记"
     self.numberOfRows = [self allNoteNumber];
     self.selectedNoteBookIndex = 0;
     
@@ -274,15 +279,15 @@
         view.backgroundColor = [UIColor clearColor];
         
         //普通header
-//            MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
-//            //设置状态栏
-//            header.stateLabel.hidden = NO;
-//            header.stateLabel.font = FONT_11;
-//            header.stateLabel.textColor = UIColorFromRGB(0xdcdcdc);
-//            //设置时间栏
-//            header.lastUpdatedTimeLabel.hidden = YES;
-//            header.lastUpdatedTimeLabel.font = FONT_11;
-//            header.lastUpdatedTimeLabel.textColor = UIColorFromRGB(0xdcdcdc);
+//        MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
+//        //设置状态栏
+//        header.stateLabel.hidden = NO;
+//        header.stateLabel.font = FONT_11;
+//        header.stateLabel.textColor = UIColorFromRGB(0xdcdcdc);
+//        //设置时间栏
+//        header.lastUpdatedTimeLabel.hidden = YES;
+//        header.lastUpdatedTimeLabel.font = FONT_11;
+//        header.lastUpdatedTimeLabel.textColor = UIColorFromRGB(0xdcdcdc);
         
         //动态GIFheader
         SZYRefreshHeader *header = [SZYRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
