@@ -446,6 +446,7 @@
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
         
         [_solidater readOneByID:self.currentNote.note_id successHandler:^(id result) {
+            
             if (result) {
                 //刷新数据
                 [_solidater updateOne:self.currentNote successHandler:^(id result) {
@@ -453,8 +454,8 @@
                     [self exitEditingState];
                 } failureHandler:^(NSString *errorMsg) {
                     NSLog(@"%@",errorMsg);
-                    
                 }];
+                
             }else{
                 //插入数据
                 [_solidater saveOne:self.currentNote successHandler:^(id result) {
