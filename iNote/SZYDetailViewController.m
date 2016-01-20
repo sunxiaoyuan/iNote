@@ -115,9 +115,6 @@
     [self.view addSubview:self.naviView];
     //一定要最后添加，工具栏位于最上层
     [self.view addSubview:self.toolView];
-    
-    
-
 }
 
 -(void)initData{
