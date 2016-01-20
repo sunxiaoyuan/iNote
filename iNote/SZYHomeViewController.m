@@ -65,7 +65,7 @@
     
     //绘制控件
     //数据表格
-    self.tableView.frame = CGRectMake(0, 64, UIScreenWidth, UIScreenHeight-64);
+    self.tableView.frame = CGRectMake(0, 64, UIScreenWidth, UIScreenHeight - 64);
     //添加笔记－视图层尺寸，注意要放在viewDidLoad中
     CGFloat iconW = SIZ(80);
     CGFloat trailSpacing = SIZ(30);

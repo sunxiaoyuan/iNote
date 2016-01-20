@@ -12,10 +12,6 @@
 #import "SZYNoteBookCell.h"
 #import "SZYNoteBookViewController.h"
 
-
-
-
-
 @interface SZYNotesViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
 @property (nonatomic, strong) UITableView          *tableView;//表视图
@@ -35,11 +31,15 @@
     
     //不需要系统自动处理顶部内容伸缩
     self.automaticallyAdjustsScrollViewInsets = NO;
-    //设置底色
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    
+    //磨砂背景
+    UIImageView *bgImageView = [[UIImageView alloc]initWithFrame:self.view.bounds];
+    bgImageView.image = [UIImage imageNamed:@"hub_bg"];
+    [self.view addSubview:bgImageView];
+    
     //加载组件
-    [self.view addSubview:self.addNoteBookBtn];
-    [self.view addSubview:self.sepLineView];
+//    [self.view addSubview:self.addNoteBookBtn];
+//    [self.view addSubview:self.sepLineView];
     [self.view addSubview:self.tableView];
     //自定义右上角按钮
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
@@ -52,16 +52,10 @@
     
     [self loadData];
     
-    self.addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
-    self.sepLineView.frame = CGRectMake(0, 44, UIScreenWidth, 1);
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
 
 #pragma mark - TableViewDelegate和TableViewDataSource
-
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
-}
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [self.noteBookArr count];
@@ -69,7 +63,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
 
-    return 100;
+    return 60;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -78,7 +72,7 @@
     if (cell == nil) {
         cell = [[SZYNoteBookCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-
+        cell.backgroundColor = [UIColor clearColor];
     }
     cell.noteBook = _noteBookArr[indexPath.row];
     return cell;
@@ -92,6 +86,11 @@
     noteBookVC.currentNoteBook = noteBook;
     [self.navigationController pushViewController:noteBookVC animated:YES];
     
+}
+
+//允许直接编辑行
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -159,19 +158,27 @@
 -(void)editBtnClick:(UIButton *)sender{
     
     if (_tableView.isEditing) {
+        [self.sepLineView removeFromSuperview];
+        self.sepLineView = nil;
         //移动表格视图
         [UIView animateWithDuration:0.3f animations:^{
             self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
             
         } completion:^(BOOL finished) {
-            self.addNoteBookBtn.hidden = YES;
+            [self.addNoteBookBtn removeFromSuperview];
+            self.addNoteBookBtn = nil;
         }];
 
     }else{
+        
+        [self.view addSubview:self.addNoteBookBtn];
         //移动表格视图
         [UIView animateWithDuration:0.3f animations:^{
             self.tableView.frame = CGRectMake(0, 45, UIScreenWidth, UIScreenHeight);
-            self.addNoteBookBtn.hidden = NO;
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [self.view addSubview:self.sepLineView];
+            }
         }];
     }
     
@@ -212,16 +219,16 @@
 -(UIButton *)addNoteBookBtn{
     if (!_addNoteBookBtn){
         _addNoteBookBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
         [_addNoteBookBtn setTitle:@"添加笔记" forState:UIControlStateNormal];
         [_addNoteBookBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [_addNoteBookBtn addTarget:self action:@selector(addNoteBookBtnClick) forControlEvents:UIControlEventTouchUpInside];
-        _addNoteBookBtn.hidden = YES;
     }
     return _addNoteBookBtn;
 }
 -(UIView *)sepLineView{
     if (!_sepLineView){
-        _sepLineView = [[UIView alloc]init];
+        _sepLineView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, UIScreenWidth, 1)];
         _sepLineView.backgroundColor = UIColorFromRGB(0xdddddd);
     }
     return _sepLineView;
@@ -231,7 +238,7 @@
         _tableView = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.dataSource = self;
-        _tableView.backgroundColor = [UIColor whiteColor];
+        _tableView.backgroundColor = [UIColor clearColor];
         UIView *view = [[UIView alloc]init];
         view.backgroundColor = [UIColor whiteColor];
         _tableView.tableFooterView = view;
