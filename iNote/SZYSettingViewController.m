@@ -103,7 +103,10 @@
         {
             //获得temp文件夹下的缓存文件大小
             float chacheSize = [self.fileManager fileSizeAtTempFolder];
-            [UIAlertController showAlertAtViewController:self withTitle:@"清除缓存" withMessage:[NSString stringWithFormat:@"缓存大小为%.2fM,确定要清理缓存吗?", chacheSize] cancelTitle:@"取消" confirmTitle:@"确定" confirmHandler:^(UIAlertAction *action){
+            
+            [UIAlertController showAlertAtViewController:self title:@"清除缓存" message:[NSString stringWithFormat:@"缓存大小为%.2fM,确定要清理缓存吗?", chacheSize] cancelTitle:@"取消" confirmTitle:@"确定" cancelHandler:^(UIAlertAction *action) {
+                //
+            } confirmHandler:^(UIAlertAction *action) {
                 //异步清除文件缓存
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     [self.fileManager cleanTempFolderHandler:^(NSError *error) {

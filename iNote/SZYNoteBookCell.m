@@ -36,6 +36,13 @@
     return self;
 }
 
+-(void)setSelected:(BOOL)selected animated:(BOOL)animated{
+    [super setSelected:selected animated:animated];
+
+    self.contentView.backgroundColor = selected ? [UIColor whiteColor] : [UIColor clearColor];
+
+}
+
 -(void)layoutSubviews{
     
     [super layoutSubviews];
@@ -45,8 +52,8 @@
     CGFloat leadingSpacing = 20;
     
     self.titleLabel.frame = CGRectMake(leadingSpacing, (viewH - 40)/2, 150, 40);
-    CGFloat btnW = 18;
-    CGFloat btnH = 20;
+    CGFloat btnW = 14;
+    CGFloat btnH = 16;
     self.privateBtn.frame = CGRectMake(viewW - btnW - leadingSpacing, (viewH - btnH)/2 , btnW, btnH);
     self.seplineView.frame = CGRectMake(0, viewH - 1, viewW - leadingSpacing, 1);
 }

@@ -11,6 +11,7 @@
 #import "SZYNoteBookModel.h"
 #import "SZYNoteBookCell.h"
 #import "SZYNoteBookViewController.h"
+#import "UIAlertController+SZYKit.h"
 
 @interface SZYNotesViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
@@ -18,10 +19,9 @@
 @property (nonatomic, strong) NSMutableArray       *noteBookArr;
 @property (nonatomic, strong) NSIndexPath          *selectIndexPath;
 @property (nonatomic, strong) SZYNoteBookModel     *selectNoteBook;
-@property (nonatomic, strong) UIButton             *addNoteBookBtn;
-@property (nonatomic, strong) UIView               *sepLineView;
 @property (nonatomic, strong) UIButton             *rightBtn;
 @property (nonatomic, strong) SZYNoteBookSolidater *noteBookSolidater;
+@property (nonatomic ,strong) UILongPressGestureRecognizer *longPressGuesture;
 @end
 
 @implementation SZYNotesViewController
@@ -38,9 +38,8 @@
     [self.view addSubview:bgImageView];
     
     //加载组件
-//    [self.view addSubview:self.addNoteBookBtn];
-//    [self.view addSubview:self.sepLineView];
     [self.view addSubview:self.tableView];
+    [self.tableView addGestureRecognizer:self.longPressGuesture];
     //自定义右上角按钮
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
     //初始化数据库工具
@@ -53,6 +52,7 @@
     [self loadData];
     
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
+    
 }
 
 #pragma mark - TableViewDelegate和TableViewDataSource
@@ -88,104 +88,119 @@
     
 }
 
-//允许直接编辑行
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
-}
-
-- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    SZYNoteBookModel *noteBook = self.noteBookArr[indexPath.row];
-    if ([noteBook.noteBook_id isEqualToString:kDEFAULT_NOTEBOOK_ID]) {
-        return UITableViewCellEditingStyleNone;
-    }else{
-        return UITableViewCellEditingStyleDelete;
-    }
-}
-
--(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    self.selectIndexPath = indexPath;
-    self.selectNoteBook = self.noteBookArr[indexPath.row];
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        //提醒用户数据改变
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"删除笔记本将导致数据丢失，您确定删除吗？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-        alert.tag = 101;
-        [alert show];
-    }
-}
-
-#pragma mark - UIAlertViewDelegate
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    
-    if (alertView.tag == 101) { //提醒用户数据改变的alert
-        if (buttonIndex == 1) {
-            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-                //数据库中删除
-                [_noteBookSolidater deleteOneByID:self.selectNoteBook.noteBook_id successHandler:^(id result) {
-                    
-                } failureHandler:^(NSString *errorMsg) {
-                    NSLog(@"error = %@",errorMsg);
-                }];
-            }];
-            //数据源中删除(这一步容易遗忘)
-            [self.noteBookArr removeObject:self.selectNoteBook];
-            
-            //局部刷新
-            [self.tableView deleteRowsAtIndexPaths:@[self.selectIndexPath] withRowAnimation:UITableViewRowAnimationBottom];
-        }
-    }else{ //新建笔记本的alert
-        if (buttonIndex == 1) {
-            UITextField *tf = [alertView textFieldAtIndex:0];
-
-            SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]initWithID:[NSString stringOfUUID] Title:tf.text UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
-            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-                //插入一行笔记本数据
-                [_noteBookSolidater saveOne:newNoteBook successHandler:^(id result) {
-                    
-                } failureHandler:^(NSString *errorMsg) {
-                    NSLog(@"error = %@",errorMsg);
-                }];
-            }];
-            [self loadData];
-        }
-    }
-}
-
 #pragma mark - 私有方法
 
--(void)editBtnClick:(UIButton *)sender{
-    
-    if (_tableView.isEditing) {
-        [self.sepLineView removeFromSuperview];
-        self.sepLineView = nil;
-        //移动表格视图
-        [UIView animateWithDuration:0.3f animations:^{
-            self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
-            
-        } completion:^(BOOL finished) {
-            [self.addNoteBookBtn removeFromSuperview];
-            self.addNoteBookBtn = nil;
-        }];
+-(void)longPressToDo:(UILongPressGestureRecognizer *)guesture{
 
-    }else{
-        
-        [self.view addSubview:self.addNoteBookBtn];
-        //移动表格视图
-        [UIView animateWithDuration:0.3f animations:^{
-            self.tableView.frame = CGRectMake(0, 45, UIScreenWidth, UIScreenHeight);
-        } completion:^(BOOL finished) {
-            if (finished) {
-                [self.view addSubview:self.sepLineView];
-            }
+    if (guesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint point = [guesture locationInView:self.tableView];
+        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:point];
+        //“默认笔记本”不能被编辑，直接跳出
+        if (!indexPath || indexPath.row == 0) return;
+        //改变选中行的状态
+        [self setCellChosen:YES forRowAtIndexPath:indexPath];
+        SZYNoteBookModel *currentNoteBook = self.noteBookArr[indexPath.row];
+        NSString *privateBtnTitle = [currentNoteBook.isPrivate isEqualToString:@"YES"] ? @"设为公开" : @"设为私密";
+        [UIAlertController showAlertSheetAtViewController:self cancelHandler:^{
+            //取消选中状态
+            [self setCellChosen:NO forRowAtIndexPath:indexPath];
+        } deleteHandler:^{
+            //删除
+            [self deleteNoteBook:currentNoteBook forRowAtIndexPath:indexPath];
+        } privateBtnTitle:privateBtnTitle privateHandler:^{
+            //修改权限
+            [self setPrivateStatus:currentNoteBook forRowAtIndexPath:indexPath];
+        } renameHandler:^{
+            //重命名
+            [self renameNoteBook:currentNoteBook forRowAtIndexPath:indexPath];
         }];
     }
+}
+
+-(void)setCellChosen:(BOOL)isChosen forRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    //进入或退出表格编辑模式
-    [_tableView setEditing:!_tableView.isEditing animated:YES];
-    sender.selected = !sender.selected;
+    [self.tableView cellForRowAtIndexPath:indexPath].backgroundColor = isChosen ? [UIColor whiteColor] : [UIColor clearColor];
+}
+
+-(void)deleteNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
     
+    [UIAlertController showAlertAtViewController:self withMessage:@"您确定删除吗？" cancelTitle:@"取消" confirmTitle:@"删除" cancelHandler:^(UIAlertAction *action) {
+        //
+    } confirmHandler:^(UIAlertAction *action) {
+        [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+            [self.noteBookSolidater deleteOneByID:noteBook.noteBook_id successHandler:^(id result) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //数据源中删除(这一步容易遗忘)
+                    [self.noteBookArr removeObject:noteBook];
+                    //局部刷新
+                    [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
+                });
+            } failureHandler:^(NSString *errorMsg) {
+                NSLog(@"%@",errorMsg);
+            }];
+        }];
+    }];
+}
+
+-(void)setPrivateStatus:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
+    noteBook.isPrivate = [noteBook.isPrivate isEqualToString:@"YES"] ? @"NO" : @"YES";
+    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+        [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
+            //在主线程刷新界面
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self loadData];
+                [self setCellChosen:NO forRowAtIndexPath:indexPath];
+            });
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"%@",errorMsg);
+        }];
+    }];
+}
+
+-(void)renameNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"重命名" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"修改" confirmHandler:^(NSString *inputStr) {
+        if ([inputStr isEqualToString:@""]) {
+            noteBook.title = @"未命名笔记本";
+        }else{
+            noteBook.title = inputStr;
+        }
+        [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+            [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self loadData];
+                    [self setCellChosen:NO forRowAtIndexPath:indexPath];
+                });
+            } failureHandler:^(NSString *errorMsg) {
+                NSLog(@"%@",errorMsg);
+            }];
+        }];
+    }];
+}
+
+-(void)addNewNoteBook:(UIButton *)sender{
+    
+    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"新建笔记本" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"创建" confirmHandler:^(NSString *inputStr) {
+        NSString *title;
+        if ([inputStr isEqualToString:@""]) {
+            title = @"未命名笔记本";
+        }else{
+            title = inputStr;
+        }
+        SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]initWithID:[NSString stringOfUUID] Title:title UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
+        [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+            //插入一行笔记本数据
+            [_noteBookSolidater saveOne:newNoteBook successHandler:^(id result) {
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //刷新界面
+                    [self loadData];
+                });
+            } failureHandler:^(NSString *errorMsg) {
+                NSLog(@"error = %@",errorMsg);
+            }];
+        }];
+    }];
 }
 
 //加载数据，刷新视图
@@ -206,33 +221,8 @@
     [self.tableView reloadData];
 }
 
--(void)addNoteBookBtnClick{
-    
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"新建笔记本" message:@"请输入笔记本的标题" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    alert.tag = 102;
-    [alert show];
-}
-
 #pragma mark - getters
 
--(UIButton *)addNoteBookBtn{
-    if (!_addNoteBookBtn){
-        _addNoteBookBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _addNoteBookBtn.frame = CGRectMake((UIScreenWidth-100)/2, 7, 100, 30);
-        [_addNoteBookBtn setTitle:@"添加笔记" forState:UIControlStateNormal];
-        [_addNoteBookBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [_addNoteBookBtn addTarget:self action:@selector(addNoteBookBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return _addNoteBookBtn;
-}
--(UIView *)sepLineView{
-    if (!_sepLineView){
-        _sepLineView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, UIScreenWidth, 1)];
-        _sepLineView.backgroundColor = UIColorFromRGB(0xdddddd);
-    }
-    return _sepLineView;
-}
 -(UITableView *)tableView{
     if (!_tableView){
         _tableView = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
@@ -251,15 +241,19 @@
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _rightBtn.backgroundColor = [UIColor clearColor];
         _rightBtn.frame = CGRectMake(0, 0, SIZ(40), SIZ(40));
-        [_rightBtn setTitle:@"编辑" forState:UIControlStateNormal];
-        [_rightBtn setTitle:@"完成" forState:UIControlStateSelected];
+        [_rightBtn setTitle:@"新建" forState:UIControlStateNormal];
         [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_rightBtn addTarget:self action:@selector(editBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [_rightBtn addTarget:self action:@selector(addNewNoteBook:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _rightBtn;
 }
 
-
-
+-(UILongPressGestureRecognizer *)longPressGuesture{
+    if (!_longPressGuesture){
+        _longPressGuesture = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPressToDo:)];
+        _longPressGuesture.minimumPressDuration = 0.5;
+    }
+    return _longPressGuesture;
+}
 
 @end

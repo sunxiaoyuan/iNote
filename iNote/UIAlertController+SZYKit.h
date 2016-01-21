@@ -23,19 +23,28 @@ typedef void (^cancle)(UIAlertAction *action);
        cancelHandler:(cancle)cancle
        confirmHandler:(confirm)confirm;
 
-//自定义标题，没有“取消”回调
 +(void)showAlertAtViewController:(UIViewController *)viewController
-                       withTitle:(NSString *)title
-                     withMessage:(NSString *)message
+                           title:(NSString *)title
+                     message:(NSString *)message
                      cancelTitle:(NSString *)cancelButtonTitle
                     confirmTitle:(NSString *)confirmButtonTitle
+                   cancelHandler:(cancle)cancle
                   confirmHandler:(confirm)confirm;
 
-//自定义标题，没有回调
-+(void)showAlertAtViewController:(UIViewController *)viewController
-                       withTitle:(NSString *)title
-                     withMessage:(NSString *)message
-                     cancelTitle:(NSString *)cancelButtonTitle
-                    confirmTitle:(NSString *)confirmButtonTitle;
+//带有输入框
++(void)showAlertWithTextFieldAtViewController:(UIViewController *)viewController
+                                        title:(NSString *)title
+                                      message:(NSString *)message
+                                  cancelTitle:(NSString *)cancelButtonTitle
+                                 confirmTitle:(NSString *)confirmButtonTitle
+                               confirmHandler:(void(^)(NSString *inputStr))confirm;
+
+//编辑笔记本专用接口
++(void)showAlertSheetAtViewController:(UIViewController *)viewController
+                        cancelHandler:(void(^)())cancelHandler
+                        deleteHandler:(void(^)())deleteHandler
+                      privateBtnTitle:(NSString *)privateBtnTitle
+                       privateHandler:(void(^)())privateHandler
+                        renameHandler:(void(^)())renameHandler;
 
 @end
