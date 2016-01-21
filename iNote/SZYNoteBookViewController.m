@@ -23,6 +23,7 @@
 @property (nonatomic, strong) NSMutableArray      *noteArr;//笔记本的列表
 @property (nonatomic, strong) NSMutableDictionary *cellStateDict;
 @property (nonatomic, strong) SZYNoteSolidater    *noteSolidater;
+@property (nonatomic, strong) UIButton             *rightBtn;
 
 @end
 
@@ -33,7 +34,8 @@
 
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
-    
+    //自定义右上角按钮
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
     self.noteSolidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
     
 }
@@ -42,7 +44,6 @@
     [super viewWillAppear:animated];
 
     [self loadData];
-
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
 
@@ -113,6 +114,14 @@
     [self.tableView reloadData];
 }
 
+#pragma mark - 响应方法
+
+-(void)addNewNote:(UIButton *)sender{
+    
+    SZYDetailViewController *newNoteVC = [[SZYDetailViewController alloc]initWithNote:nil AndSourceType:SZYFromAddType];
+    [self.navigationController pushViewController:newNoteVC animated:YES];
+}
+
 #pragma mark - getters
 
 -(UITableView *)tableView{
@@ -127,6 +136,18 @@
         [_tableView setTableFooterView:view];
     }
     return _tableView;
+}
+
+-(UIButton *)rightBtn{
+    if (!_rightBtn){
+        _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _rightBtn.backgroundColor = [UIColor clearColor];
+        _rightBtn.frame = CGRectMake(0, 0, SIZ(40), SIZ(40));
+        [_rightBtn setTitle:@"添加" forState:UIControlStateNormal];
+        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_rightBtn addTarget:self action:@selector(addNewNote:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _rightBtn;
 }
 
 @end

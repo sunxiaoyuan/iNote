@@ -7,11 +7,8 @@
 //
 
 #import "SZYNoteBookCell.h"
-
 #import "SZYNoteBookModel.h"
 #import "SZYSolidaterFactory.h"
-
-//static CGFloat const CellHeight = 100;
 
 @interface SZYNoteBookCell ()
 
@@ -36,11 +33,11 @@
     return self;
 }
 
+//设置选中后的样式
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated{
     [super setSelected:selected animated:animated];
-
+    //给一个白色背景
     self.contentView.backgroundColor = selected ? [UIColor whiteColor] : [UIColor clearColor];
-
 }
 
 -(void)layoutSubviews{
