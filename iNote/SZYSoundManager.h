@@ -15,6 +15,7 @@
 @interface SZYSoundManager : NSObject
 
 typedef void (^playProgressBlock)(int percentage, CGFloat elapsedTime, CGFloat timeRemaining, NSError *error, BOOL finished);
+
 typedef void (^recordProgressBlock)(NSString *elapsedTime, NSError *error);
 
 //初始化
