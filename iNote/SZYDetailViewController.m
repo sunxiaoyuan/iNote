@@ -39,27 +39,25 @@
 @interface SZYDetailViewController ()<SZYToolViewDelegate,SZYMenuViewDelegate,SZYCustomNaviViewDelegate,UITextFieldDelegate,UITextViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,MJPhotoBrowserDelegate,SZYChooseViewControllerDelegate,UIAlertViewDelegate,SZYRecorderViewControllerDelegate,SZYPhotoChooseViewDelegate>
 
 //导航栏
-@property (nonatomic, strong) SZYDetailNaviView *naviView;
+@property (nonatomic, strong) SZYDetailNaviView       *naviView;
 //工具栏
-@property (nonatomic, strong) SZYToolView       *toolView;
+@property (nonatomic, strong) SZYToolView             *toolView;
 //右上角菜单栏
-@property (nonatomic, strong) SZYMenuView       *menuView;
+@property (nonatomic, strong) SZYMenuView             *menuView;
 //标题
-@property (nonatomic, strong) UITextField       *titleTextField;
+@property (nonatomic, strong) UITextField             *titleTextField;
 //选择笔记本的icon
-@property (nonatomic, strong) SZYMenuButton     *noteBookIcon;
+@property (nonatomic, strong) SZYMenuButton           *noteBookIcon;
 //标题下分割线
-@property (nonatomic, strong) UIView            *sepLine;
+@property (nonatomic, strong) UIView                  *sepLine;
 //底层滚动视图
-@property (nonatomic, strong) UIScrollView      *bgScrollView;
+@property (nonatomic, strong) UIScrollView            *bgScrollView;
 //文本区域
-@property (nonatomic, strong) SZYTextView       *textView;
+@property (nonatomic, strong) SZYTextView             *textView;
 //图片
-@property (nonatomic, strong) UIImageView       *myImageView;
+@property (nonatomic, strong) UIImageView             *myImageView;
 //slider底层图层
-@property (nonatomic, strong) UIView            *optionView;
-
-
+@property (nonatomic, strong) UIView                  *optionView;
 
 @property (nonatomic, strong) SZYNoteModel            *currentNote;
 @property (nonatomic, assign) BOOL                    isCamera;

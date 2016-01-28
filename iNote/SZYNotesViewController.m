@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UIButton             *rightBtn;
 @property (nonatomic, strong) SZYNoteBookSolidater *noteBookSolidater;
 @property (nonatomic ,strong) UILongPressGestureRecognizer *longPressGuesture;
+
 @end
 
 @implementation SZYNotesViewController
@@ -38,6 +39,7 @@
     [self.view addSubview:bgImageView];
     
     //加载组件
+    //添加长按手势
     [self.view addSubview:self.tableView];
     [self.tableView addGestureRecognizer:self.longPressGuesture];
     //自定义右上角按钮
@@ -52,7 +54,6 @@
     [self loadData];
     
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
-    
 }
 
 #pragma mark - TableViewDelegate和TableViewDataSource
@@ -92,13 +93,17 @@
 
 -(void)longPressToDo:(UILongPressGestureRecognizer *)guesture{
 
-    if (guesture.state == UIGestureRecognizerStateBegan) {
+    if (guesture.state == UIGestureRecognizerStateBegan)
+    {
+        //获取手势点坐标
         CGPoint point = [guesture locationInView:self.tableView];
+        //根据坐标判断所属哪一行
         NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:point];
-        //“默认笔记本”不能被编辑，直接跳出
+        //由于“默认笔记本”不能被编辑，直接跳出
         if (!indexPath || indexPath.row == 0) return;
         //改变选中行的状态
         [self setCellChosen:YES forRowAtIndexPath:indexPath];
+        //设置弹出框的第一行标题
         SZYNoteBookModel *currentNoteBook = self.noteBookArr[indexPath.row];
         NSString *privateBtnTitle = [currentNoteBook.isPrivate isEqualToString:@"YES"] ? @"设为公开" : @"设为私密";
         [UIAlertController showAlertSheetAtViewController:self cancelHandler:^{
@@ -122,10 +127,10 @@
     [self.tableView cellForRowAtIndexPath:indexPath].backgroundColor = isChosen ? [UIColor whiteColor] : [UIColor clearColor];
 }
 
--(void)deleteNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+-(void)deleteNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
+{
     [UIAlertController showAlertAtViewController:self withMessage:@"您确定删除吗？" cancelTitle:@"取消" confirmTitle:@"删除" cancelHandler:^(UIAlertAction *action) {
-        //
+        //do nothing..
     } confirmHandler:^(UIAlertAction *action) {
         [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
             [self.noteBookSolidater deleteOneByID:noteBook.noteBook_id successHandler:^(id result) {
@@ -142,7 +147,8 @@
     }];
 }
 
--(void)setPrivateStatus:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
+-(void)setPrivateStatus:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
+{
     noteBook.isPrivate = [noteBook.isPrivate isEqualToString:@"YES"] ? @"NO" : @"YES";
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
         [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
@@ -157,14 +163,12 @@
     }];
 }
 
--(void)renameNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+-(void)renameNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
+{
     [UIAlertController showAlertWithTextFieldAtViewController:self title:@"重命名" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"修改" confirmHandler:^(NSString *inputStr) {
-        if ([inputStr isEqualToString:@""]) {
-            noteBook.title = @"未命名笔记本";
-        }else{
-            noteBook.title = inputStr;
-        }
+        //处理用户没有输入的情况
+        noteBook.title = [inputStr isEqualToString:@""] ? @"未命名笔记本" : inputStr;
+        //更新数据库
         [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
             [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -178,15 +182,12 @@
     }];
 }
 
--(void)addNewNoteBook:(UIButton *)sender{
-    
+-(void)addNewNoteBook:(UIButton *)sender
+{
     [UIAlertController showAlertWithTextFieldAtViewController:self title:@"新建笔记本" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"创建" confirmHandler:^(NSString *inputStr) {
-        NSString *title;
-        if ([inputStr isEqualToString:@""]) {
-            title = @"未命名笔记本";
-        }else{
-            title = inputStr;
-        }
+        
+        NSString *title = [inputStr isEqualToString:@""] ? @"未命名笔记本" : inputStr;
+        
         SZYNoteBookModel *newNoteBook = [[SZYNoteBookModel alloc]initWithID:[NSString stringOfUUID] Title:title UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
         [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
             //插入一行笔记本数据
@@ -251,7 +252,7 @@
 -(UILongPressGestureRecognizer *)longPressGuesture{
     if (!_longPressGuesture){
         _longPressGuesture = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPressToDo:)];
-        _longPressGuesture.minimumPressDuration = 0.5;
+        _longPressGuesture.minimumPressDuration = 0.5f;
     }
     return _longPressGuesture;
 }
