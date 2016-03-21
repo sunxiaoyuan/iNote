@@ -23,6 +23,7 @@ typedef void (^coverDidRomove)();
 - (void)recoverInterface;
 - (void)leftMenuClick;
 - (void)rightSearchClick;
+-(void)popViewController;
 
 -(void)addHub;
 -(void)removeHub;

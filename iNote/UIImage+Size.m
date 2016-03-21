@@ -7,6 +7,7 @@
 //
 
 #import "UIImage+Size.h"
+#import <Accelerate/Accelerate.h>
 
 @implementation UIImage (Size)
 
@@ -205,6 +206,60 @@
     CGImageRelease(cgimg);
     return img;
 }
+
+
++(UIImage *)blurEffectWithImage:(UIImage *)img blurRadius:(CGFloat)radius
+{
+    // CIImage
+    CIImage *ciImage = [[CIImage alloc]initWithImage:img];
+    // CIFilter
+    CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
+    // 将图片输入到滤镜中
+    [blurFilter setValue:ciImage forKey:kCIInputImageKey];
+    // 设置模糊程度
+    [blurFilter setValue:@(radius) forKey:@"inputRadius"];
+    
+    // 用来查询滤镜键命
+//    [blurFilter attributes];
+    
+    // 将处理好的图片输出
+    CIImage *outCiImage = [blurFilter valueForKey:kCIOutputImageKey];
+    // CIContext
+    CIContext *context = [CIContext contextWithOptions:nil];
+    // 获取CGImage句柄
+    CGImageRef outCGImage = [context createCGImage:outCiImage fromRect:[outCiImage extent]];
+    // 最终获取图片
+    UIImage *blurImage = [UIImage imageWithCGImage:outCGImage];
+    // 释放句柄
+    CGImageRelease(outCGImage);
+    
+    return blurImage;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

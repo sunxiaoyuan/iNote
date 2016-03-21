@@ -23,6 +23,22 @@
 
 +(void)showAlertAtViewController:(UIViewController *)viewController
                            title:(NSString *)title
+                         message:(NSString *)msg
+                     cancelTitle:(NSString *)cancelTitle
+                   cancelHandler:(void(^)())cancelHandler
+{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        cancelHandler();
+    }];
+    [alertController addAction:cancelAction];
+    
+    [viewController presentViewController:alertController animated:YES completion:nil];
+}
+
+
++(void)showAlertAtViewController:(UIViewController *)viewController
+                           title:(NSString *)title
                          message:(NSString *)message
                      cancelTitle:(NSString *)cancelButtonTitle
                     confirmTitle:(NSString *)confirmButtonTitle
@@ -50,8 +66,10 @@
                                         title:(NSString *)title
                                       message:(NSString *)message
                                   cancelTitle:(NSString *)cancelButtonTitle
+                                cancelHandler:(void(^)())cancelHandler
                                  confirmTitle:(NSString *)confirmButtonTitle
-                               confirmHandler:(void(^)(NSString *inputStr))confirm{
+                               confirmHandler:(void(^)(NSString *inputStr))confirm
+{
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     //输入框
@@ -61,7 +79,9 @@
         textField.secureTextEntry = NO;
     }];
     //取消
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        cancelHandler();
+    }];
     //确认
     UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:confirmButtonTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         //获取alertcontroller的第一个输入框的内容
@@ -100,5 +120,29 @@
     
     [viewController presentViewController:alertController animated:YES completion:nil];
 }
+
++(void)showAlertSheetAtViewController:(UIViewController *)viewController
+                        cancelHandler:(void(^)())cancelHandler
+                        cameraHandler:(void(^)())cameraHandler
+                        alburmHandler:(void(^)())alburmHandler
+{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"请选择文件来源" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        cancelHandler();
+    }];
+    UIAlertAction *cameraAction = [UIAlertAction actionWithTitle:@"照相机" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        cameraHandler();
+    }];
+    UIAlertAction *alburmAction = [UIAlertAction actionWithTitle:@"本地相簿" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        alburmHandler();
+    }];
+    [alertController addAction:cancelAction];
+    [alertController addAction:cameraAction];
+    [alertController addAction:alburmAction];
+    
+    [viewController presentViewController:alertController animated:YES completion:nil];
+}
+
+
 
 @end

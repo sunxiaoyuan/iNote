@@ -37,7 +37,7 @@
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated{
     [super setSelected:selected animated:animated];
     //给一个白色背景
-    self.contentView.backgroundColor = selected ? [UIColor whiteColor] : [UIColor clearColor];
+    self.backgroundColor = selected ? [UIColor whiteColor] : [UIColor clearColor];
 }
 
 -(void)layoutSubviews{
@@ -55,21 +55,21 @@
     self.seplineView.frame = CGRectMake(0, viewH - 1, viewW - leadingSpacing, 1);
 }
 
-#pragma mark - 响应事件
--(void)privateBtnClick:(UIButton *)sender{
-    
-    sender.selected = !sender.selected;
-    self.noteBook.isPrivate = sender.selected ? @"YES" : @"NO";
-    SZYNoteBookSolidater *noteBookSolidater = [SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
-
-    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-        [noteBookSolidater updateOne:self.noteBook successHandler:^(id result) {
-            
-        } failureHandler:^(NSString *errorMsg) {
-            NSLog(@"%@",errorMsg);
-        }];
-    }];
-}
+//#pragma mark - 响应事件
+//-(void)privateBtnClick:(UIButton *)sender{
+//    
+//    sender.selected = !sender.selected;
+//    self.noteBook.isPrivate = sender.selected ? @"YES" : @"NO";
+//    SZYNoteBookSolidater *noteBookSolidater = [SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
+//
+//    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+//        [noteBookSolidater updateOne:self.noteBook successHandler:^(id result) {
+//            
+//        } failureHandler:^(NSString *errorMsg) {
+//            NSLog(@"%@",errorMsg);
+//        }];
+//    }];
+//}
 
 #pragma mark - setters
 
@@ -98,7 +98,7 @@
     if (!_privateBtn){
         _privateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_privateBtn setBackgroundImage:[UIImage imageNamed:@"notes_lock"] forState:UIControlStateNormal];
-        [_privateBtn addTarget:self action:@selector(privateBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//        [_privateBtn addTarget:self action:@selector(privateBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         _privateBtn.hidden = YES;
     }
     return _privateBtn;

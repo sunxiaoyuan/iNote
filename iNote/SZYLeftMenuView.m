@@ -18,7 +18,6 @@
 
 @interface SZYLeftMenuView ()
 //按钮输出口
-@property (weak, nonatomic  ) IBOutlet UIButton           *loginBtn;
 @property (weak, nonatomic  ) IBOutlet SZYMenuButton      *homeBtn;
 @property (weak, nonatomic  ) IBOutlet SZYMenuButton      *notesBtn;
 @property (weak, nonatomic  ) IBOutlet SZYMenuButton      *favoriteBtn;
@@ -47,6 +46,10 @@
     self.favoriteBtn.tag = SZYleftButtonTypeFavorite;
     self.settingBtn.tag = SZYleftButtonTypeSeting;
     self.loginBtn.tag = SZYleftButtonTypeLogin;
+    
+    if (ApplicationDelegate.isLoggedin) {
+        [self.loginBtn setBackgroundImage:[ApplicationDelegate.userSession avaterAtLocal] forState:UIControlStateNormal];
+    }
 }
 
 -(void)layoutSubviews{
@@ -74,6 +77,8 @@
     //强制进行子视图的重绘
     [self.settingBtn layoutIfNeeded];
     
+    self.loginBtn.layer.masksToBounds = YES;
+    self.loginBtn.layer.cornerRadius = self.loginBtn.width/2;
 }
 
 #pragma mark - 响应事件

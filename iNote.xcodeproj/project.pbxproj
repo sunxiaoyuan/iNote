@@ -115,8 +115,6 @@
 		2BBC7F531BCD613500815AC0 /* UITextField+Validator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F521BCD613500815AC0 /* UITextField+Validator.m */; };
 		2BBC7F591BCE254800815AC0 /* UIView+SZY.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F581BCE254800815AC0 /* UIView+SZY.m */; };
 		2BBC7F5C1BCE2BD000815AC0 /* SZYInputText.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F5B1BCE2BD000815AC0 /* SZYInputText.m */; };
-		2BBC7F5F1BCE525B00815AC0 /* SZYPersonalCenterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BBC7F5E1BCE525B00815AC0 /* SZYPersonalCenterViewController.m */; };
-		2BBC7F611BCE551C00815AC0 /* PersonalCenter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2BBC7F601BCE551C00815AC0 /* PersonalCenter.storyboard */; };
 		2BBC7F641BCE905700815AC0 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BBC7F631BCE905700815AC0 /* Accelerate.framework */; };
 		2BBC7F661BCE90B200815AC0 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BBC7F651BCE90B200815AC0 /* QuartzCore.framework */; };
 		2BBC7F681BCE90C200815AC0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BBC7F671BCE90C200815AC0 /* CoreGraphics.framework */; };
@@ -138,6 +136,10 @@
 		2BDBC5221BCBB41B00ED97AF /* UIStoryboard+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BDBC51F1BCBB41B00ED97AF /* UIStoryboard+Addition.m */; };
 		2BDBC5231BCBB41B00ED97AF /* UIViewController+Create.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BDBC5201BCBB41B00ED97AF /* UIViewController+Create.m */; };
 		AFCE2B171C43C0150074EE4E /* NSObject+SZYKit.m in Sources */ = {isa = PBXBuildFile; fileRef = AFCE2B161C43C0150074EE4E /* NSObject+SZYKit.m */; };
+		C94ABA2E1C889AE400CD3EFC /* SZYPrivateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C94ABA2D1C889AE400CD3EFC /* SZYPrivateViewController.m */; };
+		C94ABA311C889BEA00CD3EFC /* SZYPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C94ABA301C889BEA00CD3EFC /* SZYPermissionViewController.m */; };
+		C97C39031C86DA1A00113ABB /* SZYPCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C97C39021C86DA1A00113ABB /* SZYPCViewController.m */; };
+		C97C390F1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C97C390E1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.m */; };
 		CC0D0CFB1C02FF5D0046C729 /* AFViewShaker.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0D0CFA1C02FF5C0046C729 /* AFViewShaker.m */; };
 		CC6A18981BE75C5800DE41FF /* SZYchooseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6A18961BE75C5800DE41FF /* SZYchooseCell.m */; };
 		CC6A18991BE75C5800DE41FF /* SZYchooseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC6A18971BE75C5800DE41FF /* SZYchooseCell.xib */; };
@@ -416,9 +418,6 @@
 		2BBC7F581BCE254800815AC0 /* UIView+SZY.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+SZY.m"; sourceTree = "<group>"; };
 		2BBC7F5A1BCE2BD000815AC0 /* SZYInputText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYInputText.h; sourceTree = "<group>"; };
 		2BBC7F5B1BCE2BD000815AC0 /* SZYInputText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYInputText.m; sourceTree = "<group>"; };
-		2BBC7F5D1BCE525B00815AC0 /* SZYPersonalCenterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYPersonalCenterViewController.h; sourceTree = "<group>"; };
-		2BBC7F5E1BCE525B00815AC0 /* SZYPersonalCenterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYPersonalCenterViewController.m; sourceTree = "<group>"; };
-		2BBC7F601BCE551C00815AC0 /* PersonalCenter.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = PersonalCenter.storyboard; sourceTree = "<group>"; };
 		2BBC7F631BCE905700815AC0 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		2BBC7F651BCE90B200815AC0 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		2BBC7F671BCE90C200815AC0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -454,6 +453,14 @@
 		2BDBC5211BCBB41B00ED97AF /* UIViewController+Create.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Create.h"; sourceTree = "<group>"; };
 		AFCE2B151C43C0150074EE4E /* NSObject+SZYKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SZYKit.h"; sourceTree = "<group>"; };
 		AFCE2B161C43C0150074EE4E /* NSObject+SZYKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SZYKit.m"; sourceTree = "<group>"; };
+		C94ABA2C1C889AE400CD3EFC /* SZYPrivateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYPrivateViewController.h; sourceTree = "<group>"; };
+		C94ABA2D1C889AE400CD3EFC /* SZYPrivateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYPrivateViewController.m; sourceTree = "<group>"; };
+		C94ABA2F1C889BEA00CD3EFC /* SZYPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYPermissionViewController.h; sourceTree = "<group>"; };
+		C94ABA301C889BEA00CD3EFC /* SZYPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYPermissionViewController.m; sourceTree = "<group>"; };
+		C97C39011C86DA1A00113ABB /* SZYPCViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYPCViewController.h; sourceTree = "<group>"; };
+		C97C39021C86DA1A00113ABB /* SZYPCViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYPCViewController.m; sourceTree = "<group>"; };
+		C97C390D1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYPersonalCenterTableViewCell.h; sourceTree = "<group>"; };
+		C97C390E1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZYPersonalCenterTableViewCell.m; sourceTree = "<group>"; };
 		CC0D0CF91C02FF5C0046C729 /* AFViewShaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFViewShaker.h; sourceTree = "<group>"; };
 		CC0D0CFA1C02FF5C0046C729 /* AFViewShaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFViewShaker.m; sourceTree = "<group>"; };
 		CC6A18951BE75C5700DE41FF /* SZYchooseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZYchooseCell.h; sourceTree = "<group>"; };
@@ -739,6 +746,10 @@
 				2B6208241BD09D87005E4039 /* SZYPhotoScrollView.m */,
 				2B8303471BD48E2E004C4575 /* SZYDatePickView.h */,
 				2B8303481BD48E2E004C4575 /* SZYDatePickView.m */,
+				2B83034B1BD4D394004C4575 /* SZYSwitch.h */,
+				2B83034C1BD4D394004C4575 /* SZYSwitch.m */,
+				C97C390D1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.h */,
+				C97C390E1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -748,9 +759,12 @@
 			children = (
 				2B44D10D1BC6D50000B1B4F0 /* SZYSettingViewController.h */,
 				2B44D10E1BC6D50000B1B4F0 /* SZYSettingViewController.m */,
-				2BBC7F5D1BCE525B00815AC0 /* SZYPersonalCenterViewController.h */,
-				2BBC7F5E1BCE525B00815AC0 /* SZYPersonalCenterViewController.m */,
-				2BBC7F601BCE551C00815AC0 /* PersonalCenter.storyboard */,
+				C97C39011C86DA1A00113ABB /* SZYPCViewController.h */,
+				C97C39021C86DA1A00113ABB /* SZYPCViewController.m */,
+				C94ABA2F1C889BEA00CD3EFC /* SZYPermissionViewController.h */,
+				C94ABA301C889BEA00CD3EFC /* SZYPermissionViewController.m */,
+				C94ABA2C1C889AE400CD3EFC /* SZYPrivateViewController.h */,
+				C94ABA2D1C889AE400CD3EFC /* SZYPrivateViewController.m */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -1205,8 +1219,6 @@
 			children = (
 				2BBC7F5A1BCE2BD000815AC0 /* SZYInputText.h */,
 				2BBC7F5B1BCE2BD000815AC0 /* SZYInputText.m */,
-				2B83034B1BD4D394004C4575 /* SZYSwitch.h */,
-				2B83034C1BD4D394004C4575 /* SZYSwitch.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -1545,7 +1557,6 @@
 				2BC091011BB24F8600E1A16D /* Main.storyboard in Resources */,
 				2BC091061BB24F8600E1A16D /* LaunchScreen.xib in Resources */,
 				CCFFB80A1C152E3F0075C540 /* jazz.mp3 in Resources */,
-				2BBC7F611BCE551C00815AC0 /* PersonalCenter.storyboard in Resources */,
 				2BC091031BB24F8600E1A16D /* Images.xcassets in Resources */,
 				2B44D26C1BC945BA00B1B4F0 /* SZYOpenListCellCell.xib in Resources */,
 				2B6208441BD0D53B005E4039 /* MBProgressHUD.bundle in Resources */,
@@ -1595,6 +1606,7 @@
 				AFCE2B171C43C0150074EE4E /* NSObject+SZYKit.m in Sources */,
 				2B44D1931BC7A0B700B1B4F0 /* KZPropertyMapper.m in Sources */,
 				2B44D2081BC7FCF300B1B4F0 /* NSData+ImageContentType.m in Sources */,
+				C94ABA311C889BEA00CD3EFC /* SZYPermissionViewController.m in Sources */,
 				2B62085F1BD0D906005E4039 /* RSKTouchView.m in Sources */,
 				2B76C3AC1BE072A2006B2B6E /* SZYLocalFileManager.m in Sources */,
 				2B44D18B1BC7681100B1B4F0 /* View+MASAdditions.m in Sources */,
@@ -1602,6 +1614,7 @@
 				2B44D0CA1BC6426E00B1B4F0 /* UIBarButtonItem+SZYBarButtonItem.m in Sources */,
 				2B44D1881BC7681100B1B4F0 /* MASViewConstraint.m in Sources */,
 				2B44D1AF1BC7A6E400B1B4F0 /* NSObject+MJProperty.m in Sources */,
+				C97C39031C86DA1A00113ABB /* SZYPCViewController.m in Sources */,
 				CC8DB8891C05F4850025678A /* SZYNoteBookViewController.m in Sources */,
 				2BC090FB1BB24F8600E1A16D /* AppDelegate.m in Sources */,
 				2B44D1DB1BC7C5AF00B1B4F0 /* SZYDataBaseService.m in Sources */,
@@ -1677,6 +1690,7 @@
 				2BBC7F1B1BCCEEB700815AC0 /* SZYRegViewController.m in Sources */,
 				2B62081E1BCFFA51005E4039 /* PZPhotoView.m in Sources */,
 				2B44D20B1BC7FCF300B1B4F0 /* SDWebImageDecoder.m in Sources */,
+				C94ABA2E1C889AE400CD3EFC /* SZYPrivateViewController.m in Sources */,
 				CCD3B9BA1BEA530E00D8A94B /* SZYRecorderViewController.m in Sources */,
 				CCD3BA591BF19A4E00D8A94B /* NSObject+Memento.m in Sources */,
 				2B26718E1BBA7F5500937B8C /* SZYMainViewController.m in Sources */,
@@ -1706,11 +1720,11 @@
 				2B266ED21BB92C7300937B8C /* SZYIntroView.m in Sources */,
 				2B44D1E41BC7FBEC00B1B4F0 /* SZYCommonToolClass.m in Sources */,
 				CC9D79A81C44CE3E004AF289 /* MJRefreshAutoGifFooter.m in Sources */,
+				C97C390F1C86DACF00113ABB /* SZYPersonalCenterTableViewCell.m in Sources */,
 				CC9D79AE1C44CE3E004AF289 /* MJRefreshGifHeader.m in Sources */,
 				2BC090F81BB24F8600E1A16D /* main.m in Sources */,
 				CCFFB8041C11685E0075C540 /* SZYSoundManager.m in Sources */,
 				2B6208461BD0D53B005E4039 /* SDWebImageManager+MJ.m in Sources */,
-				2BBC7F5F1BCE525B00815AC0 /* SZYPersonalCenterViewController.m in Sources */,
 				2BBC7F531BCD613500815AC0 /* UITextField+Validator.m in Sources */,
 				2B44D2071BC7FCF300B1B4F0 /* MKAnnotationView+WebCache.m in Sources */,
 				CC9D79A91C44CE3E004AF289 /* MJRefreshAutoNormalFooter.m in Sources */,

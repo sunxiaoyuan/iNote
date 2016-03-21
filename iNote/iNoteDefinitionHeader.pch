@@ -79,6 +79,8 @@
 
 //本地存储有关
 
+#define NoteBookPswKey         @"NoteBookPswKey"
+
 #define UDUserSession          @"user_session"
 
 #define kDEFAULT_NOTEBOOK_ID   @"iNoteDefaultNoteBookID"//默认笔记本id

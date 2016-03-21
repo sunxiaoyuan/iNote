@@ -30,6 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
     //不需要系统自动处理顶部内容伸缩
     self.automaticallyAdjustsScrollViewInsets = NO;
     
@@ -50,6 +51,7 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    
     
     [self loadData];
     
@@ -82,11 +84,32 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     SZYNoteBookModel *noteBook = _noteBookArr[indexPath.row];
-    //调转到笔记本展示界面
-    SZYNoteBookViewController *noteBookVC = [[SZYNoteBookViewController alloc]initWithTitle:noteBook.title BackButton:YES];
-    noteBookVC.currentNoteBook = noteBook;
-    [self.navigationController pushViewController:noteBookVC animated:YES];
     
+    if ([noteBook.isPrivate isEqualToString:@"YES"]) {
+        //私密笔记，需要验证密码
+        [UIAlertController showAlertWithTextFieldAtViewController:self title:@"验证" message:@"请输入密码" cancelTitle:@"取消" cancelHandler:^{
+            
+            [tableView cellForRowAtIndexPath:indexPath].selected = NO;
+            
+        }confirmTitle:@"确定" confirmHandler:^(NSString *inputStr) {
+            if ([inputStr isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:NoteBookPswKey]]) {
+                //不是私密笔记，直接跳转
+                SZYNoteBookViewController *noteBookVC = [[SZYNoteBookViewController alloc]initWithTitle:noteBook.title BackButton:YES];
+                noteBookVC.currentNoteBook = noteBook;
+                [self.navigationController pushViewController:noteBookVC animated:YES];
+            }
+            else{
+                
+                [tableView cellForRowAtIndexPath:indexPath].selected = NO;
+            }
+        }];
+    }
+    else{
+        //不是私密笔记，直接跳转
+        SZYNoteBookViewController *noteBookVC = [[SZYNoteBookViewController alloc]initWithTitle:noteBook.title BackButton:YES];
+        noteBookVC.currentNoteBook = noteBook;
+        [self.navigationController pushViewController:noteBookVC animated:YES];
+    }
 }
 
 #pragma mark - 私有方法
@@ -106,6 +129,7 @@
         //设置弹出框的第一行标题
         SZYNoteBookModel *currentNoteBook = self.noteBookArr[indexPath.row];
         NSString *privateBtnTitle = [currentNoteBook.isPrivate isEqualToString:@"YES"] ? @"设为公开" : @"设为私密";
+        
         [UIAlertController showAlertSheetAtViewController:self cancelHandler:^{
             //取消选中状态
             [self setCellChosen:NO forRowAtIndexPath:indexPath];
@@ -130,7 +154,8 @@
 -(void)deleteNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [UIAlertController showAlertAtViewController:self withMessage:@"您确定删除吗？" cancelTitle:@"取消" confirmTitle:@"删除" cancelHandler:^(UIAlertAction *action) {
-        //do nothing..
+        //取消选中状态
+        [self setCellChosen:NO forRowAtIndexPath:indexPath];
     } confirmHandler:^(UIAlertAction *action) {
         [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
             [self.noteBookSolidater deleteOneByID:noteBook.noteBook_id successHandler:^(id result) {
@@ -149,23 +174,40 @@
 
 -(void)setPrivateStatus:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    noteBook.isPrivate = [noteBook.isPrivate isEqualToString:@"YES"] ? @"NO" : @"YES";
-    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-        [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
-            //在主线程刷新界面
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self loadData];
-                [self setCellChosen:NO forRowAtIndexPath:indexPath];
-            });
-        } failureHandler:^(NSString *errorMsg) {
-            NSLog(@"%@",errorMsg);
-        }];
+    
+    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"验证" message:@"请输入密码" cancelTitle:@"取消" cancelHandler:^{
+        
+        [self.tableView cellForRowAtIndexPath:indexPath].selected = NO;
+        
+    }confirmTitle:@"确定" confirmHandler:^(NSString *inputStr) {
+        if ([inputStr isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:NoteBookPswKey]]) {
+            //验证成功
+            noteBook.isPrivate = [noteBook.isPrivate isEqualToString:@"YES"] ? @"NO" : @"YES";
+            [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+                [self.noteBookSolidater updateOne:noteBook successHandler:^(id result) {
+                    //在主线程刷新界面
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self loadData];
+                        [self setCellChosen:NO forRowAtIndexPath:indexPath];
+                    });
+                } failureHandler:^(NSString *errorMsg) {
+                    NSLog(@"%@",errorMsg);
+                }];
+            }];
+        }else{
+            //验证失败
+            [self.tableView cellForRowAtIndexPath:indexPath].selected = NO;
+        }
     }];
 }
 
 -(void)renameNoteBook:(SZYNoteBookModel *)noteBook forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"重命名" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"修改" confirmHandler:^(NSString *inputStr) {
+    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"重命名" message:@"请输入笔记本的名称" cancelTitle:@"取消" cancelHandler:^{
+        
+        [self setCellChosen:NO forRowAtIndexPath:indexPath];
+        
+    }confirmTitle:@"修改" confirmHandler:^(NSString *inputStr) {
         //处理用户没有输入的情况
         noteBook.title = [inputStr isEqualToString:@""] ? @"未命名笔记本" : inputStr;
         //更新数据库
@@ -184,7 +226,9 @@
 
 -(void)addNewNoteBook:(UIButton *)sender
 {
-    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"新建笔记本" message:@"请输入笔记本的名称" cancelTitle:@"取消" confirmTitle:@"创建" confirmHandler:^(NSString *inputStr) {
+    [UIAlertController showAlertWithTextFieldAtViewController:self title:@"新建笔记本" message:@"请输入笔记本的名称" cancelTitle:@"取消" cancelHandler:^{
+        // do nothing
+    }confirmTitle:@"创建" confirmHandler:^(NSString *inputStr) {
         
         NSString *title = [inputStr isEqualToString:@""] ? @"未命名笔记本" : inputStr;
         
@@ -211,13 +255,19 @@
         self.noteBookArr = [NSMutableArray array];
     }
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-
         //获取笔记本简介列表
-        [_noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
+        [_noteBookSolidater readWithoutNoteListByCriteria:@"WHERE user_id_belonged = ?" queryValue:ApplicationDelegate.userSession.user_id successHandler:^(id result) {
             self.noteBookArr = (NSMutableArray *)result;
         } failureHandler:^(NSString *errorMsg) {
             NSLog(@"error = %@",errorMsg);
         }];
+        
+        
+//        [_noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
+//            self.noteBookArr = (NSMutableArray *)result;
+//        } failureHandler:^(NSString *errorMsg) {
+//            NSLog(@"error = %@",errorMsg);
+//        }];
     }];
     [self.tableView reloadData];
 }

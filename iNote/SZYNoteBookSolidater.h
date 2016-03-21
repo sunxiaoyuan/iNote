@@ -22,7 +22,7 @@
 
 -(void)readAllSuccessHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure;
 
--(void)readAllWithoutNoteListSuccessHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure;
+-(void)readWithoutNoteListByCriteria:(NSString *)criteria queryValue:(id)queryValue successHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure;
 
 //删除
 -(void)deleteByCriteria:(NSString *)criteria deleteValue:(id)deleteValue successHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure;

@@ -24,18 +24,17 @@
 @property (nonatomic, copy  ) NSString       *phone_number;
 //密码
 @property (nonatomic, copy  ) NSString       *login_password;
+//生日
+@property (nonatomic ,strong) NSString       *user_birth;
 //头像
 @property (nonatomic, copy  ) NSString       *head_portrait_url;
-//图片
-@property (nonatomic, strong) NSMutableArray *image_url_list;
+
 
 - (instancetype)initWithPhoneNumber:(NSString *)phoneNumber AndUserID:(NSString *)user_id;
 -(void)cleanLocalSaveData;
 
 -(void)saveAvater:(UIImage *)img;
--(void)saveImages:(NSMutableArray *)imgArr;
 
--(NSMutableArray *)photosAtLocal;
 -(UIImage *)avaterAtLocal;
 
 @end

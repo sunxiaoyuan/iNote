@@ -98,21 +98,22 @@
     [self readByCriteria:@"" queryValue:nil successHandler:success failureHandler:failure];
 }
 
--(void)readAllWithoutNoteListSuccessHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure{
+
+-(void)readWithoutNoteListByCriteria:(NSString *)criteria queryValue:(id)queryValue successHandler:(dbSuccessHandler)success failureHandler:(dbFailureHandler)failure{
     
-    NSString *sql = [NSString stringWithFormat:@"SELECT * FROM %@",tableName];
-    [_dbService executeReadSql:sql queryValue:nil successHandler:^(id result) {
+    NSString *sql = [NSString stringWithFormat:@"SELECT * FROM %@ %@",tableName,criteria];
+    [_dbService executeReadSql:sql queryValue:queryValue successHandler:^(id result) {
         FMResultSet *rs = (FMResultSet *)result;
         NSMutableArray *tempArr = [NSMutableArray array];
-        while ([rs next]) {
-            SZYNoteBookModel *tempNoteBook = [[SZYNoteBookModel alloc]init];
-            tempNoteBook.noteBook_id = [rs stringForColumn:@"noteBook_id"];
-            tempNoteBook.user_id_belonged = [rs stringForColumn:@"user_id_belonged"];
-            tempNoteBook.title = [rs stringForColumn:@"title"];
-            tempNoteBook.isPrivate = [rs stringForColumn:@"isPrivate"];
-            [tempArr addObject:tempNoteBook];
-        }
-        success(tempArr);
+            while ([rs next]) {
+                SZYNoteBookModel *tempNoteBook = [[SZYNoteBookModel alloc]init];
+                tempNoteBook.noteBook_id = [rs stringForColumn:@"noteBook_id"];
+                tempNoteBook.user_id_belonged = [rs stringForColumn:@"user_id_belonged"];
+                tempNoteBook.title = [rs stringForColumn:@"title"];
+                tempNoteBook.isPrivate = [rs stringForColumn:@"isPrivate"];
+                [tempArr addObject:tempNoteBook];
+            }
+            success(tempArr);
     } failureHandler:failure];
 }
 

@@ -23,6 +23,13 @@ typedef void (^cancle)(UIAlertAction *action);
        cancelHandler:(cancle)cancle
        confirmHandler:(confirm)confirm;
 
+
++(void)showAlertAtViewController:(UIViewController *)viewController
+                           title:(NSString *)title
+                         message:(NSString *)msg
+                     cancelTitle:(NSString *)cancelTitle
+                   cancelHandler:(void(^)())cancelHandler;
+
 +(void)showAlertAtViewController:(UIViewController *)viewController
                            title:(NSString *)title
                      message:(NSString *)message
@@ -36,6 +43,7 @@ typedef void (^cancle)(UIAlertAction *action);
                                         title:(NSString *)title
                                       message:(NSString *)message
                                   cancelTitle:(NSString *)cancelButtonTitle
+                                cancelHandler:(void(^)())cancelHandler
                                  confirmTitle:(NSString *)confirmButtonTitle
                                confirmHandler:(void(^)(NSString *inputStr))confirm;
 
@@ -46,5 +54,12 @@ typedef void (^cancle)(UIAlertAction *action);
                       privateBtnTitle:(NSString *)privateBtnTitle
                        privateHandler:(void(^)())privateHandler
                         renameHandler:(void(^)())renameHandler;
+
+
++(void)showAlertSheetAtViewController:(UIViewController *)viewController
+                        cancelHandler:(void(^)())cancelHandler
+                        cameraHandler:(void(^)())cameraHandler
+                        alburmHandler:(void(^)())alburmHandler;
+
 
 @end

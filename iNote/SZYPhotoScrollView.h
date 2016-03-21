@@ -22,4 +22,5 @@
 @property (nonatomic, weak) id<SZYPhotoScrollViewClickDelegate> aDelegate;
 
 -(NSMutableArray *)setPhoto:(NSMutableArray *)photoList;
+
 @end

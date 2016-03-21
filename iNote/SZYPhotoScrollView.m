@@ -35,7 +35,7 @@
     [super layoutSubviews];
     
     CGFloat h = self.frame.size.height;
-    self.addPhotoBtn.frame = CGRectMake(SIZ(10), (h-SIZ(40))/2, SIZ(40), SIZ(40));
+    self.addPhotoBtn.frame = CGRectMake(SIZ(10), (h-SIZ(60))/2, SIZ(70), SIZ(60));
   
 }
 
@@ -57,11 +57,11 @@
         CGFloat h = self.frame.size.height;
         UIImageView *imageView;
         if (self.addPhotoBtn.hidden) {
-            imageView = [[UIImageView alloc] initWithFrame:CGRectMake(SIZ(10)+i * (SIZ(50)), (h-SIZ(40))/2, SIZ(40), SIZ(40))];
+            imageView = [[UIImageView alloc] initWithFrame:CGRectMake(SIZ(10)+i * (SIZ(70)), (h-SIZ(60))/2, SIZ(60), SIZ(60))];
         }else{
-            imageView = [[UIImageView alloc] initWithFrame:CGRectMake(SIZ(60) + i * (SIZ(50)), (h-SIZ(40))/2, SIZ(40), SIZ(40))];
+            imageView = [[UIImageView alloc] initWithFrame:CGRectMake(SIZ(80) + i * (SIZ(70)), (h-SIZ(60))/2, SIZ(60), SIZ(60))];
         }
-        imageView.image = [UIImage imageWithContentsOfFile:photoList[i]];
+        imageView.image = photoList[i];
         [self.photoArray addObject:imageView];
         [imageView.layer setCornerRadius:3];
         imageView.layer.masksToBounds = YES;
@@ -70,7 +70,7 @@
         [self addSubview:imageView];
         [self addSubview:btn];
     }
-    self.contentSize = CGSizeMake(SIZ(11) + photoList.count * SIZ(62) + SIZ(62) , 0);
+    self.contentSize = CGSizeMake(SIZ(11) + photoList.count * SIZ(82) + SIZ(82) , 0);
     return self.photoArray;
 }
 

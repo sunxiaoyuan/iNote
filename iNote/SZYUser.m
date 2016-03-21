@@ -18,7 +18,6 @@
     if (self) {
         self.phone_number = phoneNumber;
         self.user_id = user_id;
-        self.image_url_list = [NSMutableArray array];
     }
     return self;
 }
@@ -41,27 +40,6 @@
         NSLog(@"%@",error);
         
     }];
-}
-
--(void)saveImages:(NSMutableArray *)imgArr {
-    
-    for (UIImage *img in imgArr) {
-        NSString *imageName = [NSString stringWithFormat:@"%ld%@-%@.jpg",[NSDate currentTimeStampWithLongFormat],_user_id,kUserImageSuffix];
-        [[SZYLocalFileManager sharedInstance] saveFile:img fileName:imageName withType:kUserImageFolderType successHandler:^(NSString *filePath) {
-            [self.image_url_list addObject:filePath];
-        } failureHandler:^(NSError *error) {
-            NSLog(@"%@",error);
-        }];
-    }
-}
-
--(NSMutableArray *)photosAtLocal{
-    
-    NSMutableArray *imgArr = [NSMutableArray array];
-    for (NSString *imgURL in self.image_url_list) {
-        [imgArr addObject:[[SZYLocalFileManager sharedInstance] imageFileAtPath:imgURL]];
-    }
-    return imgArr;
 }
 
 -(UIImage *)avaterAtLocal{

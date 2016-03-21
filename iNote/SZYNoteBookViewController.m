@@ -12,8 +12,6 @@
 #import "SZYNoteBookModel.h"
 #import "SZYNoteFrameInfo.h"
 #import "SZYNoteDisplayCell.h"
-#import "MJRefresh.h"
-#import "SZYRefreshHeader.h"
 #import "SZYSolidaterFactory.h"
 #import "SZYDetailViewController.h"
 
@@ -23,7 +21,6 @@
 @property (nonatomic, strong) NSMutableArray      *noteArr;//笔记本的列表
 @property (nonatomic, strong) NSMutableDictionary *cellStateDict;
 @property (nonatomic, strong) SZYNoteSolidater    *noteSolidater;
-@property (nonatomic, strong) UIButton             *rightBtn;
 
 @end
 
@@ -31,18 +28,20 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
+    self.navigationItem.rightBarButtonItem = nil;
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
-    //自定义右上角按钮
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:self.rightBtn];
     self.noteSolidater = (SZYNoteSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteModel class])];
-    
+    self.noteArr = [NSMutableArray array];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-
+    
+    //恢复导航栏
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
     [self loadData];
     self.tableView.frame = CGRectMake(0, 0, UIScreenWidth, UIScreenHeight);
 }
@@ -51,9 +50,6 @@
 
 -(void)loadData{
     
-    if (!self.noteArr) {
-        self.noteArr = [NSMutableArray array];
-    }
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
         [_noteSolidater readOneByPID:self.currentNoteBook.noteBook_id successHandler:^(id result) {
             self.noteArr = (NSMutableArray *)result;
@@ -65,20 +61,21 @@
 }
 
 #pragma mark - TableViewDelegate和TableViewDataSource
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return self.noteArr.count;
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     SZYNoteFrameInfo *info;
     NSNumber *cellState = self.cellStateDict[@(indexPath.row)];
     info = [[SZYNoteFrameInfo alloc]initWithNote:self.noteArr[indexPath.row] Type:[cellState integerValue]];
     return info.cellHeight;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     static NSString *cellID = @"NoteDisplayCell";
     SZYNoteDisplayCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
     if (!cell) {
@@ -95,16 +92,18 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     SZYDetailViewController * detailVC = [[SZYDetailViewController alloc]initWithNote:self.noteArr[indexPath.row] AndSourceType:SZYFromListType];
+    //隐藏导航栏
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
     [self.navigationController pushViewController:detailVC animated:YES];
 }
 
 #pragma mark - SZYNoteDisplayCellDelegate
 
--(void)allInfoBtnDidClick:(UIButton *)sender IndexPath:(NSIndexPath *)indexPath{
-    
+-(void)allInfoBtnDidClick:(UIButton *)sender IndexPath:(NSIndexPath *)indexPath
+{
     sender.selected = !sender.selected;
     if (sender.selected) {
         [self.cellStateDict setObject:@(SZYCellStateType_All) forKey:@(indexPath.row)];
@@ -114,13 +113,6 @@
     [self.tableView reloadData];
 }
 
-#pragma mark - 响应方法
-
--(void)addNewNote:(UIButton *)sender{
-    
-    SZYDetailViewController *newNoteVC = [[SZYDetailViewController alloc]initWithNote:nil AndSourceType:SZYFromAddType];
-    [self.navigationController pushViewController:newNoteVC animated:YES];
-}
 
 #pragma mark - getters
 
@@ -138,16 +130,5 @@
     return _tableView;
 }
 
--(UIButton *)rightBtn{
-    if (!_rightBtn){
-        _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _rightBtn.backgroundColor = [UIColor clearColor];
-        _rightBtn.frame = CGRectMake(0, 0, SIZ(40), SIZ(40));
-        [_rightBtn setTitle:@"添加" forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_rightBtn addTarget:self action:@selector(addNewNote:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return _rightBtn;
-}
 
 @end

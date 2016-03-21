@@ -17,8 +17,9 @@
 +(UIImage *)imageWithCaputureView:(UIView *)view;
 //截取部分图像
 +(UIImage*)getSubImage:(UIImage *)image mCGRect:(CGRect)mCGRect centerBool:(BOOL)centerBool;
-
 //修正方向
 +(UIImage *)fixOrientation:(UIImage *)aImage;
+//模糊图片
++(UIImage *)blurEffectWithImage:(UIImage *)img blurRadius:(CGFloat)radius;
 
 @end

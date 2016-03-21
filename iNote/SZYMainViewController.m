@@ -19,6 +19,7 @@
 #import "SZYFavoriteViewController.h"
 #import "SZYSettingViewController.h"
 #import "SZYLgoinViewController.h"
+#import "SZYPCViewController.h"
 
 @interface SZYMainViewController ()<SZYIntroViewDelegate,SZYLeftMenuViewDelegate,UIGestureRecognizerDelegate>
 
@@ -49,9 +50,14 @@
     SZYNotesViewController *notesVC = [[SZYNotesViewController alloc]initWithTitle:@"笔记本" BackButton:NO];
     SZYFavoriteViewController *favVC = [[SZYFavoriteViewController alloc]initWithTitle:@"收藏" BackButton:NO];
     SZYSettingViewController *setVC = [[SZYSettingViewController alloc]initWithTitle:@"设置" BackButton:NO];
-    SZYLgoinViewController *logVC = [[SZYLgoinViewController alloc] initWithTitle:@"登录" BackButton:NO];
-    NSArray *vcArr = @[homeVC,notesVC,favVC,setVC,logVC];
-    
+    SZYBaseViewController *lastVC;
+    if (ApplicationDelegate.isLoggedin) {
+        lastVC = [[SZYPCViewController alloc]initWithTitle:@"个人中心" BackButton:NO];
+    }
+    else{
+        lastVC = [[SZYLgoinViewController alloc] initWithTitle:@"登录" BackButton:NO];
+    }
+    NSArray *vcArr = @[homeVC,notesVC,favVC,setVC,lastVC];
     for (int i = 0; i < [vcArr count]; i ++) {
         SZYNavigationController *nc = [[SZYNavigationController alloc]initWithRootViewController:vcArr[i]];
         nc.view.layer.shadowColor = [UIColor blackColor].CGColor;
@@ -73,6 +79,9 @@
         [self.view addSubview:self.introView];
     }
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userHaveLogIn) name:@"UserHaveLogIn" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userHaveSetAvater) name:@"UserHaveSetAvater" object:nil];
+
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -122,6 +131,16 @@
 }
 
 #pragma mark - 响应方法
+
+-(void)userHaveLogIn
+{
+    [self switchViewControllerFrom:SZYleftButtonTypeLogin To:SZYleftButtonTypeHome];
+}
+
+-(void)userHaveSetAvater
+{
+    [self.leftMenuView.loginBtn setBackgroundImage:[ApplicationDelegate.userSession avaterAtLocal] forState:UIControlStateNormal];
+}
 
 -(void)panGesture:(UIPanGestureRecognizer *)pan{
     

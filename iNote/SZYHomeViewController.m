@@ -27,10 +27,11 @@
 @property (nonatomic, strong) SZYOpenListView     *openListView;//下拉列表
 @property (nonatomic, strong) NSMutableArray      *noteBookArr;//笔记本的列表
 @property (nonatomic, strong) UITableView         *tableView;//数据表格
-@property (nonatomic, assign) NSInteger           selectedNoteBookIndex;
-@property (nonatomic, assign) NSInteger           numberOfRows;
 @property (nonatomic, strong) SZYMenuButton       *addNoteBtn;
 @property (nonatomic, strong) NSMutableDictionary *cellStateDict;
+
+@property (nonatomic, assign) NSInteger           selectedNoteBookIndex;
+@property (nonatomic, assign) NSInteger           numberOfRows;
 
 @end
 
@@ -104,7 +105,6 @@
     
     self.selectedNoteBookIndex = selectedIndex;
     //如果选中全部，需要更新行数
-
     if (_selectedNoteBookIndex == 0){
         self.numberOfRows = [self allNoteNumber];
     }else{
@@ -216,7 +216,7 @@
     //在主线程中到数据库查询数据，这里需要阻塞主线程
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
         //获得数据库中所有数据
-        [solidater readAllSuccessHandler:^(id result) {
+        [solidater readByCriteria:@"WHERE user_id_belonged = ?" queryValue:ApplicationDelegate.userSession.user_id successHandler:^(id result) {
             self.noteBookArr = (NSMutableArray *)result;
             [self.tableView.header endRefreshing];
         } failureHandler:^(NSString *errorMsg) {
@@ -277,7 +277,8 @@
         _tableView.backgroundColor = [UIColor whiteColor];
         UIView *view = [[UIView alloc]init];
         view.backgroundColor = [UIColor clearColor];
-        
+        [_tableView setTableFooterView:view];
+
         //普通header
 //        MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
 //        //设置状态栏
@@ -295,8 +296,8 @@
         header.stateLabel.hidden = NO;
         header.stateLabel.font = FONT_11;
         header.stateLabel.textColor = UIColorFromRGB(0xdcdcdc);
+        
         _tableView.header = header;
-        [_tableView setTableFooterView:view];
     }
     return _tableView;
 }

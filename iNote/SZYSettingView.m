@@ -20,7 +20,6 @@
 
 @implementation SZYSettingView
 
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -34,14 +33,12 @@
     return self;
 }
 
-
 +(instancetype)settingViewWithTitle:(NSString *)title{
     
     SZYSettingView *settingView = [[SZYSettingView alloc]init];
     settingView.leftLabel.text = title;
     return settingView;
 }
-
 
 -(void)layoutSubviews{
     [super layoutSubviews];
@@ -54,8 +51,8 @@
     CGFloat labelY = (viewH - labelH) / 2;
     _leftLabel.frame = CGRectMake(kItemLeadingSpacing, labelY, labelW, labelH);
     
-    CGFloat imageH = viewH * 0.4;
-    CGFloat imageW = imageH * 0.3;
+    CGFloat imageH = viewH * 0.3;
+    CGFloat imageW = imageH * 0.8 ;
     CGFloat imageX = viewW - kItemLeadingSpacing - imageW;
     CGFloat imageY = (viewH - imageH) / 2;
     _rightImageView.frame = CGRectMake(imageX, imageY, imageW, imageH);
@@ -66,8 +63,8 @@
 -(UILabel *)leftLabel{
     if (!_leftLabel){
         _leftLabel = [[UILabel alloc]init];
-        _leftLabel.font = FONT_20;
-        _leftLabel.textColor = UIColorFromRGB(0x888888);
+        _leftLabel.font = FONT_14;
+        _leftLabel.textColor = UIColorFromRGB(0x333333);
         _leftLabel.textAlignment = NSTextAlignmentLeft;
     }
     return _leftLabel;

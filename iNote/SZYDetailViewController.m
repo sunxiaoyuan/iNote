@@ -143,13 +143,13 @@
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
+    
     //导航栏
     self.naviView.frame = CGRectMake(0, 0, UIScreenWidth, NavigationBarHeight);
     //工具栏
     self.toolView.frame = CGRectMake(0, UIScreenHeight-SIZ(40), UIScreenWidth, SIZ(40));
     //菜单栏
     self.menuView.frame = CGRectMake(UIScreenWidth-SIZ(100), self.naviView.bottom - SIZ(60), SIZ(100), SIZ(60));
-    self.menuView.frame = CGRectMake(UIScreenWidth-SIZ(100), 0, SIZ(100), SIZ(60));
     //标题输入框
     self.titleTextField.frame = CGRectMake(kLeadingSpacing, CGRectGetMaxY(self.naviView.frame)+SIZ(5),UIScreenWidth-2*kLeadingSpacing-kNoteBookIconWidth-SIZ(5), SIZ(30));
     //选择笔记本按钮
@@ -178,6 +178,12 @@
     self.bgScrollView.contentSize = CGSizeMake(self.bgScrollView.width, self.myImageView.bottom +SIZ(10));
     
     [self registerNotification];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
 }
 
 -(void)registerNotification{
@@ -477,7 +483,8 @@
     switch (sender.tag) {
         case 101: //点击收藏
         {
-            self.currentNote.isFavorite = sender.selected?@"YES":@"NO";
+            sender.selected = !sender.selected;
+            self.currentNote.isFavorite = sender.selected ? @"YES" : @"NO";
             [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
                 [self.solidater updateOne:self.currentNote successHandler:^(id result) {
                     //收起菜单栏
@@ -487,7 +494,7 @@
                     NSLog(@"%@",errorMsg);
                 }];
             }];
-            sender.selected = !sender.selected;
+            
         }
             break;
         case 102: //点击删除

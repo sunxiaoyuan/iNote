@@ -62,15 +62,14 @@
 -(void)layoutSubviews{
     [super layoutSubviews];
     
-    CGFloat w = self.frame.size.width;
-    CGFloat h = self.frame.size.height;
+    CGFloat w = self.bounds.size.width;
+    CGFloat h = self.bounds.size.height;
     
     self.headerView.frame = CGRectMake(0, 0, w, h * 0.2);
     self.cancelBtn.frame = CGRectMake(SIZ(5), 0, SIZ(80), self.headerView.frame.size.height);
     self.sureBtn.frame = CGRectMake(self.headerView.frame.size.width-SIZ(85), 0, SIZ(80), self.headerView.frame.size.height);
     
     self.picker.frame = CGRectMake(0, CGRectGetMaxY(self.headerView.frame), w, h * 0.8);
-    
 }
 
 #pragma mark - 响应事件

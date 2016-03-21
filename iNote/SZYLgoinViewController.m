@@ -12,6 +12,11 @@
 #import "AFViewShaker.h"
 #import "SZYRegViewController.h"
 #import "SZYHomeViewController.h"
+#import "SZYUser.h"
+#import "NSString+SZYKit.h"
+#import "SZYLocalFileManager.h"
+#import "SZYNoteBookSolidater.h"
+#import "SZYNoteBookModel.h"
 
 static CGFloat const kOffsetLeftHand = 60;
 
@@ -117,13 +122,13 @@ static CGFloat const kOffsetLeftHand = 60;
     return YES;
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField {
+-(void)textFieldDidBeginEditing:(UITextField *)textField {
     
     if (textField == self.pswTextField) {
         [self oweShyStatus];
     }
 }
-- (void)textFieldDidEndEditing:(UITextField *)textField{
+-(void)textFieldDidEndEditing:(UITextField *)textField{
     if (textField == self.pswTextField) {
         [self oweLookStatus];
     }
@@ -204,13 +209,40 @@ static CGFloat const kOffsetLeftHand = 60;
         //修改本地所有相关个人信息的设置
         
         NSLog(@"验证成功");
-        ApplicationDelegate.isLoggedin = YES;
-        [self.navigationController popViewControllerAnimated:YES];
+        //更新本地用户文件系统
+        [self refreshUpLocalInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UserHaveLogIn" object:nil];
         
     }else{
         [self showMessage:@"请输入6～20位密码" becomeFirstResponder:self.pswTextField];
         return;
     }
+}
+
+//更新本地文件夹信息
+-(void)refreshUpLocalInfo
+{
+    SZYUser *user = [[SZYUser alloc]initWithPhoneNumber:self.userTextField.text AndUserID:[NSString stringOfUUID]];
+    ApplicationDelegate.userSession = user;
+    [ApplicationDelegate.userSession solidateDataWithKey:UDUserSession];
+    //为新用户创建本地一级目录
+    [[SZYLocalFileManager sharedInstance] setUpLocalFileDir:kUserFolderType];
+    ApplicationDelegate.isLoggedin = YES;
+    [self createDefaultNoteBook];
+}
+
+//创建默认笔记本
+-(void)createDefaultNoteBook
+{
+    SZYNoteBookSolidater *solidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
+    SZYNoteBookModel *defaultNoteBook = [[SZYNoteBookModel alloc]initWithID:kDEFAULT_NOTEBOOK_ID Title:@"默认笔记本" UserID:ApplicationDelegate.userSession.user_id IsPrivate:@"NO"];
+    [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
+        [solidater saveOne:defaultNoteBook successHandler:^(id result) {
+            
+        } failureHandler:^(NSString *errorMsg) {
+            NSLog(@"error = %@",errorMsg);
+        }];
+    }];
 }
 
 -(void)showMessage:(NSString *)msg becomeFirstResponder:(UITextField *)textField{
@@ -225,7 +257,7 @@ static CGFloat const kOffsetLeftHand = 60;
 //点击注册
 -(void)registerClick{
     
-    SZYRegViewController *regVC = [[SZYRegViewController alloc]initWithTitle:@"注册" BackButton:NO];
+    SZYRegViewController *regVC = [[SZYRegViewController alloc]initWithTitle:@"注册" BackButton:YES];
     [self.navigationController pushViewController:regVC animated:YES];
 }
 

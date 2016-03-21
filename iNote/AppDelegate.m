@@ -31,6 +31,10 @@
     self.dbQueue = [FMDatabaseQueue databaseQueueWithPath:self.dbasePath];
     //初始化本地信息
     [self setUpLocalInfo];
+    
+    //设置假的笔记本密码
+    [[NSUserDefaults standardUserDefaults] setObject:@"123" forKey:NoteBookPswKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
    
     return YES;
 }

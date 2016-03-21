@@ -104,7 +104,8 @@
     
     SZYNoteBookSolidater *noteBookSolidater = (SZYNoteBookSolidater *)[SZYSolidaterFactory solidaterFctoryWithType:NSStringFromClass([SZYNoteBookModel class])];
     [ApplicationDelegate.dbQueue inDatabase:^(FMDatabase *db) {
-        [noteBookSolidater readAllWithoutNoteListSuccessHandler:^(id result) {
+        
+        [noteBookSolidater readWithoutNoteListByCriteria:@"WHERE user_id_belonged = ?" queryValue:ApplicationDelegate.userSession.user_id successHandler:^(id result) {
             self.allNoteBookArr = (NSMutableArray *)result;
         } failureHandler:^(NSString *errorMsg) {
             NSLog(@"%@",errorMsg);

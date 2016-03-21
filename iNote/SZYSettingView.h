@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-//WNXSetingView的类型
+//SZYSetingView的类型
 typedef NS_ENUM(NSInteger, SZYSetingViewType) {
-    SZYSetingViewTypePersonalCenter,      //个人中心
-    SZYSetingViewTypeCleanCache,          //清除缓存
+    SZYSetingViewTypePersonalCenter,
+    SZYSetingViewTypeCleanCache,
+    SZYSetingViewTypePrivate,
+    SZYSetingViewTypeAboutUs
 };
 
 @interface SZYSettingView : UIView

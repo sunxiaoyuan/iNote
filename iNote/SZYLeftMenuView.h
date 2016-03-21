@@ -26,5 +26,7 @@ typedef NS_ENUM(NSInteger, SZYleftButtonType) {
 @interface SZYLeftMenuView : UIView
 
 @property (nonatomic, weak) id <SZYLeftMenuViewDelegate> delegate;
+@property (weak, nonatomic  ) IBOutlet UIButton           *loginBtn;
+
 
 @end
