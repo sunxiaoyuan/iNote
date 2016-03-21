@@ -171,7 +171,6 @@
         CGFloat myImageViewW = self.bgScrollView.width;
         CGFloat myImageViewH = myImageViewW * self.myImageView.image.size.height / self.myImageView.image.size.width;
         self.myImageView.frame = CGRectMake( 0, self.textView.bottom+kTextAndImageSpacing, myImageViewW, myImageViewH);
-        
     }
     if ([self.currentNote haveVideo]) [self.view addSubview:self.showVideoBtn];
     
@@ -426,11 +425,8 @@
 }
 
 //完成编辑后，点击右上角“完成”的响应事件
--(void)doneBtnDidClick:(UIButton *)sender{
-
-    //退出编辑模式
-    [self exitEditingState];
-    
+-(void)doneBtnDidClick:(UIButton *)sender
+{
     //整合数据，准备存储
     if (!self.belongedNoteBook) {
         self.currentNote.noteBook_id_belonged = kDEFAULT_NOTEBOOK_ID;//默认放在“默认笔记本下”
